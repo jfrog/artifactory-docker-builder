@@ -1,0 +1,4 @@
+[Artifactory-oss]
+name=Artifactory-oss
+baseurl=@artifactory_contextUrl@/artifactory-oss/
+gpgcheck=0

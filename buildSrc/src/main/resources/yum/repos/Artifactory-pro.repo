@@ -1,0 +1,4 @@
+[Artifactory-pro]
+name=Artifactory-pro
+baseurl=@artifactory_contextUrl@/artifactory-pro/
+gpgcheck=0

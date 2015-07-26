@@ -1,0 +1,125 @@
+/*
+ * Copyright (C) 2015 JFrog Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'application'
+apply plugin: 'groovy'
+apply plugin: 'idea'
+
+version = '1.0'
+
+def artifactoryVersion = project.hasProperty("artifactory_version") ? artifactory_version : ""
+def dockerUrl = project.hasProperty("DOCKER_URL") ? DOCKER_URL : "http://localhost:4243/"
+
+def artifactoryType = project.hasProperty("ARTIFACTORY_TYPE") ? ARTIFACTORY_TYPE : "pro"
+
+def os = project.hasProperty("OS") ? OS : "centos:6.6"
+def registry = project.hasProperty("registry") ? registry : System.getenv("registry")
+def artifactory_dependenciesUrl = project.hasProperty("artifactory_dependenciesUrl") ? artifactory_dependenciesUrl : System.getenv("artifactory_dependenciesUrl")
+
+buildscript {
+
+    repositories {
+        maven {
+            url artifactory_dependenciesUrl
+        }
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.jfrog.artifactory.client:artifactory-java-client-services:0.18-SNAPSHOT'
+    }
+}
+
+
+repositories {
+    maven {
+        url artifactory_dependenciesUrl
+    }
+    jcenter()
+}
+
+dependencies {
+    compile "org.codehaus.groovy:groovy-all:2.4.3"
+    compile "org.spockframework:spock-core:0.7-groovy-2.0"
+    compile "org.codehaus.groovy.modules.http-builder:http-builder:0.7"
+    compile "org.jfrog.artifactory.client:artifactory-java-client-services:0.18-SNAPSHOT"
+    compile 'org.jfrog.util:docker-remote-util:0.2-SNAPSHOT'
+}
+
+task publishImagesToBintray(type: BintrayPushTask) {
+    setArtifactoryVersion(artifactoryVersion)
+    setBintrayRepo(project.hasProperty('bintray_repo') ? bintray_repo : System.getenv("bintray_repo"))
+    setBintraySubject(project.hasProperty('bintray_subject') ? bintray_subject : System.getenv("bintray_subject"))
+    setBintrayRegistry(project.hasProperty('bintray_registry') ? bintray_registry : System.getenv("bintray_registry"))
+    setArtifactoryRepo(project.hasProperty('docker_repo') ? docker_repo : System.getenv("docker_repo"))
+    setPushLatestTag(project.hasProperty('pushLatest') ? pushLatest.toBoolean() : false)
+}
+
+task createArtifactoryRegistry(type: ArtifactoryTask) {
+    setArtifactoryType("pro")
+    setEnableNginx(true)
+}
+
+task createArtifactoryPro(type: ArtifactoryTask) {
+    setArtifactoryType("pro")
+}
+
+task createArtifactoryOss(type: ArtifactoryTask) {
+    setArtifactoryType("oss")
+}
+
+task createCentos(type: CentosTask) {
+    setRegistry(registry)
+}
+
+tasks.withType(BaseTask) {
+    setHostUrl(dockerUrl)
+    setRegistry(registry)
+    setArtifactoryVersion(artifactoryVersion)
+}
+
+tasks.withType(ArtifactoryTask) {
+    dependsOn 'createCentos'
+    setPushToArtifactory(project.hasProperty('push_to_artifactory') ? push_to_artifactory.toBoolean() : false)
+    setCreateLatestTag(project.hasProperty('latest_tag') ? latest_tag.toBoolean() : false)
+}
+
+task release(dependsOn: ['createArtifactoryOss', 'createArtifactoryPro','createArtifactoryRegistry','publishImagesToBintray','test']) {
+    description 'Start the entire release cycle (Build images -> Publish to Bintray -> Test)'
+}
+
+task buildAll(dependsOn: ['createArtifactoryOss', 'createArtifactoryPro','createArtifactoryRegistry']) {
+    description 'Build all artifactory docker images (Oss, Pro, Docker-Registry)'
+}
+
+/** ************************************************************************************************/
+/********************* Test Tasks *****************************************************************/
+/** ************************************************************************************************/
+
+test {
+
+    testLogging {
+        events 'started', 'passed', 'skipped', 'failed'
+    }
+
+    /*Pass Here all the required System Properties*/
+    systemProperty 'DOCKER_URL', dockerUrl
+    systemProperty 'ARTIFACTORY_VERSION', artifactoryVersion
+
+    maxParallelForks = 1
+}
+
+
+

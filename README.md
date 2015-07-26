@@ -5,7 +5,7 @@
 This project is gradle-groovy based using [docker-remote-util](https://github.com/JFrogDev/docker-remote-util) library to interact with docker remote API.
 
 ##Public Usage:
-./gradlew createArtifactoryOss -Partifactory_version=3.9.2 - Builds artifactory OSS 3.9.2 on a centos-6.6 with openjdk-1.8.0
+./gradlew createArtifactoryOss -Partifactory_version=3.9.2 - Builds artifactory OSS 3.9.2 on a centos-6.6 with openjdk-1.8.0 <br>
 ./gradlew createArtifactoryRegistry - Builds artifactory pro latest version ready as docker registry
 
 ###Gradle Tasks:
@@ -15,7 +15,8 @@ This project is gradle-groovy based using [docker-remote-util](https://github.co
 4. createArtifactoryRegistry - Create artifactory image with nginx and docker registry configured
 5. publishImagesToBintray - Push tag/latest from Artifactory  to Bintray "https://bintray.com/jfrog/registry"
 6. test - Download the latest tag from bintray and run sanity test on the image
-7. release - Running all tasks
+7. buildAll - Builds artifactory of each type (Oss, Pro, Docker-registry)
+8. release - Running all tasks
 
 ###Project Properties:
 1. artifactory_version - the requested artifactory version to build, Default: latest available release version

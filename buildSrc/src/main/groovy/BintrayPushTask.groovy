@@ -31,7 +31,6 @@ class BintrayPushTask extends BaseTask {
     RESTClient rClient = null
     Artifactory artifactory = null
     String bintrayRepo = null
-    String bintrayRegistry = null
     String bintraySubject = null
     String artifactoryRepo = null
 
@@ -100,10 +99,6 @@ class BintrayPushTask extends BaseTask {
 
     void setBintrayRepo(String bintrayRepo) {
         this.bintrayRepo = bintrayRepo
-    }
-
-    void setBintrayRegistry(String bintrayRegistry) {
-        this.bintrayRegistry = bintrayRegistry
     }
 
     void setArtifactoryRepo(String artifactoryRepo) {

@@ -42,7 +42,7 @@ abstract class BaseSpec extends Specification {
     @Shared
     String artifactoryVersion = null
     @Shared
-    String bintrayRegistry = 'jfrog-int-docker-dockerv1.bintray.io'
+    String bintrayRegistry = System.getProperty("bintray_registry")
     @Shared
     protected static Logger logger = Logger.getLogger('baseSpecs')
 

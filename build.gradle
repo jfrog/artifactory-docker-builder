@@ -62,7 +62,6 @@ task publishImagesToBintray(type: BintrayPushTask) {
     setArtifactoryVersion(artifactoryVersion)
     setBintrayRepo(project.hasProperty('bintray_repo') ? bintray_repo : System.getenv("bintray_repo"))
     setBintraySubject(project.hasProperty('bintray_subject') ? bintray_subject : System.getenv("bintray_subject"))
-    setBintrayRegistry(project.hasProperty('bintray_registry') ? bintray_registry : System.getenv("bintray_registry"))
     setArtifactoryRepo(project.hasProperty('docker_repo') ? docker_repo : System.getenv("docker_repo"))
     setPushLatestTag(project.hasProperty('pushLatest') ? pushLatest.toBoolean() : false)
 }
@@ -117,6 +116,7 @@ test {
     /*Pass Here all the required System Properties*/
     systemProperty 'DOCKER_URL', dockerUrl
     systemProperty 'ARTIFACTORY_VERSION', artifactoryVersion
+    systemProperty 'bintray_registry', project.hasProperty('bintray_registry') ? bintray_registry : System.getenv("bintray_registry")
 
     maxParallelForks = 1
 }

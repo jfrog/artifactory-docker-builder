@@ -47,7 +47,7 @@ class BintrayPushTask extends BaseTask {
         String dockerRegistry = project.hasProperty('artifactory_contextUrl') ? project.getProperty('artifactory_contextUrl') : System.getenv("artifactory_contextUrl")
         artifactory = ArtifactoryClient.create(dockerRegistry, user, pass)
         applicationNames.each { it ->
-            DockerImage image = dockerClient.image().registry(registry).namespace("jfrog-artifactory").repository(it).tag(artifactoryVersion)
+            DockerImage image = dockerClient.image().registry(registry).namespace("jfrog").repository(it).tag(artifactoryVersion)
             if (imageExistsRemotely(image)) {
                 pushToBintray(image)
                 if (pushLatestTag) {

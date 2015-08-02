@@ -77,8 +77,8 @@ class ArtifactoryTask extends BaseTask {
     private void initArtifactoryImage() {
         this.artifactoryImage = dockerClient.image()
                 .registry(registry)
-                .namespace("jfrog-artifactory")
-                .repository(enableNginx ? "registry" : artifactoryType)
+                .namespace("jfrog")
+                .repository("artifactory-"+(enableNginx ? "registry" : artifactoryType))
                 .tag(artifactoryVersion)
     }
 

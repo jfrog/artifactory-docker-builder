@@ -99,7 +99,7 @@ task release(dependsOn: ['createArtifactoryOss', 'createArtifactoryPro','createA
     description 'Start the entire release cycle (Build images -> Publish to Bintray -> Test)'
 }
 
-task buildAll(dependsOn: ['createArtifactoryOss', 'createArtifactoryPro','createArtifactoryRegistry']) {
+task createAll(dependsOn: ['createArtifactoryOss', 'createArtifactoryPro','createArtifactoryRegistry']) {
     description 'Build all artifactory docker images (Oss, Pro, Docker-Registry)'
 }
 

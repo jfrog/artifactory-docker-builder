@@ -15,7 +15,7 @@ This project is gradle-groovy based using [docker-remote-util](https://github.co
 4. createArtifactoryRegistry - Create artifactory image with nginx and docker registry configured
 5. publishImagesToBintray - Push tag/latest from Artifactory  to Bintray "https://bintray.com/jfrog/registry"
 6. test - Download the latest tag from bintray and run sanity test on the image
-7. buildAll - Builds artifactory of each type (Oss, Pro, Docker-registry)
+7. createAll - Builds artifactory of each type (Oss, Pro, Docker-registry)
 8. release - Running all tasks
 
 ###Project Properties:

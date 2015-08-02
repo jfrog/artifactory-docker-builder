@@ -34,7 +34,7 @@ class BintrayPushTask extends BaseTask {
     String bintraySubject = null
     String artifactoryRepo = null
 
-    def applicationNames = ['pro', 'oss', 'registry']
+    def applicationNames = ['artifactory-pro', 'artifactory-oss', 'artifactory-registry']
 
     BintrayPushTask() {
         description = 'Push tag/latest from artifactory to Bintray'

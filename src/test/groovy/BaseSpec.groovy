@@ -90,8 +90,4 @@ abstract class BaseSpec extends Specification {
     }
 
     abstract String getDockerRepository() ;
-
-    void setDockerNamespace(String dockerNamespace) {
-        this.dockerNamespace = dockerNamespace
-    }
 }

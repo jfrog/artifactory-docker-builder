@@ -33,6 +33,7 @@ class BintrayPushTask extends BaseTask {
     String bintrayRepo = null
     String bintraySubject = null
     String artifactoryRepo = null
+    String dockerNamespace = null
 
     def applicationNames = ['artifactory-pro', 'artifactory-oss', 'artifactory-registry']
 
@@ -47,7 +48,7 @@ class BintrayPushTask extends BaseTask {
         String dockerRegistry = project.hasProperty('artifactory_contextUrl') ? project.getProperty('artifactory_contextUrl') : System.getenv("artifactory_contextUrl")
         artifactory = ArtifactoryClient.create(dockerRegistry, user, pass)
         applicationNames.each { it ->
-            DockerImage image = dockerClient.image().registry(registry).namespace("jfrog").repository(it).tag(artifactoryVersion)
+            DockerImage image = dockerClient.image().registry(registry).namespace(dockerNamespace).repository(it).tag(artifactoryVersion)
             if (imageExistsRemotely(image)) {
                 pushToBintray(image)
                 if (pushLatestTag) {
@@ -107,5 +108,9 @@ class BintrayPushTask extends BaseTask {
 
     void setBintraySubject(String bintraySubject) {
         this.bintraySubject = bintraySubject
+    }
+
+    void setDockerNamespace(String dockerNamespace) {
+        this.dockerNamespace = dockerNamespace
     }
 }

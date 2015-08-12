@@ -32,6 +32,7 @@ class ArtifactoryTask extends BaseTask {
     boolean pushToArtifactory = false
     boolean enableNginx = false
     boolean createLatestTag = false
+    String dockerNamespace = null
 
     ArtifactoryTask() {
         description = "Build artifactory docker image"
@@ -77,7 +78,7 @@ class ArtifactoryTask extends BaseTask {
     private void initArtifactoryImage() {
         this.artifactoryImage = dockerClient.image()
                 .registry(registry)
-                .namespace("jfrog")
+                .namespace(dockerNamespace)
                 .repository("artifactory-"+(enableNginx ? "registry" : artifactoryType))
                 .tag(artifactoryVersion)
     }
@@ -189,5 +190,9 @@ class ArtifactoryTask extends BaseTask {
 
     void setCreateLatestTag(boolean createLatestTag) {
         this.createLatestTag = createLatestTag
+    }
+
+    void setDockerNamespace(String dockerNamespace) {
+        this.dockerNamespace = dockerNamespace
     }
 }

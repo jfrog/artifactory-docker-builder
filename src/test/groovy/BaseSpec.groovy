@@ -44,6 +44,8 @@ abstract class BaseSpec extends Specification {
     @Shared
     String bintrayRegistry = System.getProperty("bintray_registry")
     @Shared
+    String dockerNamespace = System.getProperty("docker_namespace")
+    @Shared
     protected static Logger logger = Logger.getLogger('baseSpecs')
 
     String dockerRepository = null
@@ -53,7 +55,7 @@ abstract class BaseSpec extends Specification {
         dockerClient = new DockerClient(dockerUrl)
         artifactoryClient = new ArtifactoryClient()
         artifactoryVersion = System.getProperty("ARTIFACTORY_VERSION")
-        artifactoryImage = dockerClient.image().registry(bintrayRegistry).namespace("jfrog").repository(getDockerRepository()).tag("latest").doCreate()
+        artifactoryImage = dockerClient.image().registry(bintrayRegistry).namespace(dockerNamespace).repository(getDockerRepository()).tag("latest").doCreate()
         artifactoryContainer = artifactoryImage.getNewContainer().doCreate()
         artifactoryContainer.doStart()
         waitForArtifactory()
@@ -88,4 +90,8 @@ abstract class BaseSpec extends Specification {
     }
 
     abstract String getDockerRepository() ;
+
+    void setDockerNamespace(String dockerNamespace) {
+        this.dockerNamespace = dockerNamespace
+    }
 }

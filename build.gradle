@@ -64,6 +64,7 @@ task publishImagesToBintray(type: BintrayPushTask) {
     setBintraySubject(project.hasProperty('bintray_subject') ? bintray_subject : System.getenv("bintray_subject"))
     setArtifactoryRepo(project.hasProperty('docker_repo') ? docker_repo : System.getenv("docker_repo"))
     setPushLatestTag(project.hasProperty('pushLatest') ? pushLatest.toBoolean() : false)
+    setDockerNamespace(project.hasProperty('docker_namespace') ? docker_namespace : System.getenv("docker_namespace"))
 }
 
 task createArtifactoryRegistry(type: ArtifactoryTask) {
@@ -93,6 +94,7 @@ tasks.withType(ArtifactoryTask) {
     dependsOn 'createCentos'
     setPushToArtifactory(project.hasProperty('push_to_artifactory') ? push_to_artifactory.toBoolean() : false)
     setCreateLatestTag(project.hasProperty('latest_tag') ? latest_tag.toBoolean() : false)
+    setDockerNamespace(project.hasProperty('docker_namespace') ? docker_namespace : System.getenv("docker_namespace"))
 }
 
 task release(dependsOn: ['createArtifactoryOss', 'createArtifactoryPro','createArtifactoryRegistry','publishImagesToBintray','test']) {
@@ -117,6 +119,7 @@ test {
     systemProperty 'DOCKER_URL', dockerUrl
     systemProperty 'ARTIFACTORY_VERSION', artifactoryVersion
     systemProperty 'bintray_registry', project.hasProperty('bintray_registry') ? bintray_registry : System.getenv("bintray_registry")
+    systemProperty 'docker_namespace', project.hasProperty('docker_namespace') ? docker_namespace : System.getenv("docker_namespace")
 
     maxParallelForks = 1
 }

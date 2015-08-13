@@ -74,7 +74,12 @@ class ArtifactoryTask extends BaseTask {
             dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" --enablerepo="Artifactory-'+artifactoryType+
                     '" '+artifactoryPackage+(artifactoryVersion == "latest" ? "" : "-"+artifactoryVersion)
         } else {
-            dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y http://frogops.artifactoryonline.com/frogops/artifactory-'+artifactoryType+'/artifactory-'+artifactoryVersion+'.rpm'
+            if (artifactoryType == "oss") {
+                dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-'+artifactoryType+'/artifactory-'+artifactoryVersion+'.rpm'
+            } else {
+                dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-'+artifactoryType+'/org/artifactory/powerpack/artifactory-powerpack-rpm/'+
+                        artifactoryVersion+'/artifactory-powerpack-rpm-'+artifactoryVersion+'.rpm'
+            }
         }
         dfb.cmd "/tmp/runArtifactory.sh"
         if (enableNginx) {

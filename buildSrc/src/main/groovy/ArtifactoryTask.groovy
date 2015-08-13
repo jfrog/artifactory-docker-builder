@@ -65,13 +65,17 @@ class ArtifactoryTask extends BaseTask {
         dfb.expose 8081
         dfb.add this.getClass().getResource("artifactory/runArtifactory.sh").path, "/tmp/"
         def artifactoryPackage = null
-        if (Integer.parseInt(artifactoryVersion[0]) < 4) {
+        if (artifactoryVersion != "latest" && Integer.parseInt(artifactoryVersion[0]) < 4) {
             artifactoryPackage = "artifactory"
         } else {
             artifactoryPackage = "jfrog-artifactory-"+artifactoryType
         }
-        dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" --enablerepo="Artifactory-'+artifactoryType+
-                '" '+artifactoryPackage+(artifactoryVersion == "latest" ? "" : "-"+artifactoryVersion)
+        if (artifactoryVersion == "latest" || Integer.parseInt(artifactoryVersion[0]) >= 4) {
+            dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" --enablerepo="Artifactory-'+artifactoryType+
+                    '" '+artifactoryPackage+(artifactoryVersion == "latest" ? "" : "-"+artifactoryVersion)
+        } else {
+            dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y http://frogops.artifactoryonline.com/frogops/artifactory-'+artifactoryType+'/artifactory-'+artifactoryVersion+'.rpm'
+        }
         dfb.cmd "/tmp/runArtifactory.sh"
         if (enableNginx) {
             dfb.add this.getClass().getResource("artifactory/artifactory.config.xml").path, '/etc/opt/jfrog/artifactory/artifactory.config.xml'

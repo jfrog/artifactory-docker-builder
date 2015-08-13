@@ -81,7 +81,7 @@ class ArtifactoryTask extends BaseTask {
                         artifactoryVersion+'/artifactory-powerpack-rpm-'+artifactoryVersion+'.rpm'
             }
         }
-        dfb.run 'mkdir -p /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup}' +
+        dfb.run 'mkdir -p /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup} && ' +
             'chown -R artifactory: /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup}'
         dfb.cmd "/tmp/runArtifactory.sh"
         if (enableNginx) {

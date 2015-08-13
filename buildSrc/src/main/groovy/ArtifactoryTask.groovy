@@ -65,7 +65,7 @@ class ArtifactoryTask extends BaseTask {
         dfb.expose 8081
         dfb.add this.getClass().getResource("artifactory/runArtifactory.sh").path, "/tmp/"
         def artifactoryPackage = null
-        if (Integer.parseInt(artifactoryVersion[0]) >= 4) {
+        if (Integer.parseInt(artifactoryVersion[0]) < 4) {
             artifactoryPackage = "artifactory"
         } else {
             artifactoryPackage = "jfrog-artifactory-"+artifactoryType

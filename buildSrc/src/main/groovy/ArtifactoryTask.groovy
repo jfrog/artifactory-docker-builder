@@ -64,7 +64,7 @@ class ArtifactoryTask extends BaseTask {
         }
         dfb.expose 8081
         dfb.add this.getClass().getResource("artifactory/runArtifactory.sh").path, "/tmp/"
-        def artifactoryPackage
+        def artifactoryPackage = null
         if (artifactoryVersion != "latest" && Integer.parseInt(artifactoryVersion[0]) < 4) {
             artifactoryPackage = "artifactory"
         } else {
@@ -81,11 +81,8 @@ class ArtifactoryTask extends BaseTask {
                         artifactoryVersion+'/artifactory-powerpack-rpm-'+artifactoryVersion+'.rpm'
             }
         }
-        //Add mount(need to pre create the folders or the volume will fail)
-        def ARTIFACTORY_HOME = '/var/opt/jfrog/artifactory'
-        dfb.run("mkdir -p "+ARTIFACTORY_HOME+"/data "+ARTIFACTORY_HOME+"/logs "+ARTIFACTORY_HOME+"/backup && "+
-                "chown -R artifactory: "+ARTIFACTORY_HOME+"/data "+ARTIFACTORY_HOME+"/logs "+ARTIFACTORY_HOME+"/backup")
-
+        dfb.run 'mkdir -p /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup}' +
+            'chown -R artifactory: /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup}'
         dfb.cmd "/tmp/runArtifactory.sh"
         if (enableNginx) {
             dfb.add this.getClass().getResource("artifactory/artifactory.config.xml").path, '/etc/opt/jfrog/artifactory/artifactory.config.xml'

@@ -55,7 +55,8 @@ abstract class BaseSpec extends Specification {
         dockerClient = new DockerClient(dockerUrl)
         artifactoryClient = new ArtifactoryClient()
         artifactoryVersion = System.getProperty("pushLatest").toBoolean() ? "latest" : System.getProperty("ARTIFACTORY_VERSION")
-        artifactoryImage = dockerClient.image().registry(bintrayRegistry).namespace(dockerNamespace).repository(getDockerRepository()).tag(artifactoryVersion).doCreate()
+        def tag = System.getProperty("pushLatest").toBoolean() ? "latest" : artifactoryVersion
+        artifactoryImage = dockerClient.image().registry(bintrayRegistry).namespace(dockerNamespace).repository(getDockerRepository()).tag(tag).doCreate()
         artifactoryContainer = artifactoryImage.getNewContainer().doCreate()
         artifactoryContainer.doStart()
         waitForArtifactory()

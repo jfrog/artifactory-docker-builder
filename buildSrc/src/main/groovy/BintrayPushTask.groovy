@@ -83,9 +83,9 @@ class BintrayPushTask extends BaseTask {
 
     boolean imageExistsRemotely(DockerImage image) {
         //The line below suits for docker v2
-        //def manifest = artifactory.repository(artifactoryRepo).download("${image.getNamespace()}/${image.getRepository()}/${image.getTag()}/manifest.json").doDownload()
+        def manifest = artifactory.repository(artifactoryRepo).download("${image.getNamespace()}/${image.getRepository()}/${image.getTag()}/manifest.json").doDownload()
         //The line below suits for docker v1
-        def manifest = artifactory.repository(artifactoryRepo).download("repositories/${image.getNamespace()}/${image.getRepository()}/${image.getTag()}/tag.json").doDownload()
+        //def manifest = artifactory.repository(artifactoryRepo).download("repositories/${image.getNamespace()}/${image.getRepository()}/${image.getTag()}/tag.json").doDownload()
         if (manifest) {
             println "${image.getFullImageName()} successfully pulled from artifactory docker repository."
             return true

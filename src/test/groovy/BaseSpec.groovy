@@ -54,7 +54,7 @@ abstract class BaseSpec extends Specification {
         def dockerUrl = System.getProperty('DOCKER_URL')
         dockerClient = new DockerClient(dockerUrl)
         artifactoryClient = new ArtifactoryClient()
-        artifactoryVersion = System.getProperty("pushLatest").toBoolean() ? "latest" : System.getProperty("ARTIFACTORY_VERSION")
+        artifactoryVersion = System.getProperty("ARTIFACTORY_VERSION")
         def tag = System.getProperty("pushLatest").toBoolean() ? "latest" : artifactoryVersion
         artifactoryImage = dockerClient.image().registry(bintrayRegistry).namespace(dockerNamespace).repository(getDockerRepository()).tag(tag).doCreate()
         artifactoryContainer = artifactoryImage.getNewContainer().doCreate()

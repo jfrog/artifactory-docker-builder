@@ -40,7 +40,7 @@ class CentosTask extends BaseTask{
         dfb.from centosBaseImage.getFullImageName()
         dfb.maintainer "matank@jfrog.com"
         dfb.add reposFilesToCopy(), "/etc/yum.repos.d/"
-        dfb.run "rm -rf /etc/yum.repos.d/Centos* && yum install java-1.8.0-openjdk rsync net-tools -y && yum clean all" //Install pre-requisites
+        dfb.run "rm -rf /etc/yum.repos.d/Centos* && yum install java-1.8.0-openjdk-devel rsync net-tools -y && yum clean all" //Install pre-requisites
 
         dfb.create()
     }

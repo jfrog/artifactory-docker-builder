@@ -23,7 +23,7 @@ class DockerProSpec extends BaseSpec {
 
     @Override
     def waitForArtifactory() {
-        artifactoryAdmin = artifactoryClient.create("http://${artifactoryContainer.inspect().NetworkSettings.IPAddress}:8081/artifactory/", "admin", "password")
+        artifactoryAdmin = artifactoryClient.create("http://${getHostFromDockerUrl()}:8081/artifactory/", "admin", "password")
         int retries = 40
         while (retries > 0) {
             try {

@@ -46,18 +46,19 @@ abstract class BaseSpec extends Specification {
     @Shared
     String dockerNamespace = System.getProperty("docker_namespace")
     @Shared
+    def dockerUrl = System.getProperty('DOCKER_URL')
     protected static Logger logger = Logger.getLogger('baseSpecs')
 
     String dockerRepository = null
 
     def setupSpec() {
-        def dockerUrl = System.getProperty('DOCKER_URL')
         dockerClient = new DockerClient(dockerUrl)
         artifactoryClient = new ArtifactoryClient()
         artifactoryVersion = System.getProperty("ARTIFACTORY_VERSION")
         def tag = System.getProperty("pushLatest").toBoolean() ? "latest" : artifactoryVersion
         artifactoryImage = dockerClient.image().registry(bintrayRegistry).namespace(dockerNamespace).repository(getDockerRepository()).tag(tag).doCreate()
         artifactoryContainer = artifactoryImage.getNewContainer().doCreate()
+        artifactoryContainer.startConfig.addPortBinding(8081, "tcp", "0.0.0.0", 8081)
         artifactoryContainer.doStart()
         waitForArtifactory()
     }
@@ -78,7 +79,7 @@ abstract class BaseSpec extends Specification {
     }
 
     def waitForArtifactory() {
-        artifactoryAdmin = artifactoryClient.create("http://${artifactoryContainer.inspect().NetworkSettings.IPAddress}:8081/artifactory/", "admin", "password")
+        artifactoryAdmin = artifactoryClient.create("http://${getHostFromDockerUrl()}:8081/artifactory/", "admin", "password")
         def retries = 40
         while (retries > 0) {
             if (artifactoryAdmin.system().ping()) {
@@ -90,5 +91,10 @@ abstract class BaseSpec extends Specification {
         }
     }
 
-    abstract String getDockerRepository() ;
+    def String getHostFromDockerUrl() {
+        def host = dockerUrl.find(/https?:\/\/(.*):.*/) { match -> return match[1] }
+        return host
+    }
+
+    abstract String getDockerRepository();
 }

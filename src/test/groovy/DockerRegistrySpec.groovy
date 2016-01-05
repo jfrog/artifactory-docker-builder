@@ -13,44 +13,94 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import org.jfrog.artifactory.client.ArtifactoryRequest
+import org.jfrog.artifactory.client.impl.ArtifactoryRequestImpl
 import org.jfrog.util.docker.DockerContainer
 import org.jfrog.util.docker.DockerImage
 
 class DockerRegistrySpec extends DockerProSpec {
+
+    private DockerImage dockerImage
+    private String artName
+    private DockerContainer dockerContainer
 
 
     def "Push DOCKER image to local repositories"() {
         setup:
         DockerImage testImage = dockerClient.image().registry("frogops-docker-dockerv2-local.artifactoryonline.com").namespace("templates").repository("busybox").tag("latest")
         DockerImage deployImage = dockerClient.image().registry("artifactory.local:5001").namespace("templates").repository("busybox").tag("latest")
-        DockerImage dockerImage = dockerClient.image().registry("frogops-docker-dockerv2-local.artifactoryonline.com").repository("docker").tag("1.6.2").doCreate()
-        String artname = artifactoryContainer.inspect().Name
-        DockerContainer dockerContainer = dockerImage.getNewContainer()
-        dockerContainer.createConfig
+        this.dockerContainer.createConfig
                 .addEnv("DOCKER_DAEMON_ARGS", "--insecure-registry artifactory.local:5001")
                 .addCommand(
                 "docker pull " + testImage.getFullImageName() + "; " +
                         "docker tag " + testImage.getFullImageName() + " " + deployImage.getFullImageName() + "; " +
                         "curl  -uadmin:password https://artifactory.local:5001/v1/auth -k > ~/.dockercfg ; " +
                         "docker push " + deployImage.getFullImageName(), false)
-        dockerContainer.doCreate()
-        dockerContainer.startConfig.withPrivileges().addLink(artname, "artifactory.local").addLink(artname, "artifactory2.local").addLink(artname, "artifactory2.remote")
+        this.dockerContainer.doCreate()
+        this.dockerContainer.startConfig.withPrivileges().addLink(this.artName, "artifactory.local").addLink(this.artName, "artifactory2.local").addLink(this.artName, "artifactory2.remote")
 
         when:
-        def dockerLogs = dockerContainer.doStart(600).logs()
+        def dockerLogs = this.dockerContainer.doStart(600).logs()
 
         then:
         dockerLogs.find(/job push\(${deployImage.getFullImageName(false)}\) = OK \(0\)/)
 
         cleanup:
+        if (this.dockerContainer) {
+            this.dockerContainer.doDelete(true, true)
+        }
+    }
+
+    def "Docker Login Test"() {
+        setup:
+        setRepositoryToForceAuthentication("docker-dev-local2")
+        dockerContainer.createConfig
+                .addEnv("DOCKER_DAEMON_ARGS", "--insecure-registry artifactory.local:5002")
+                .addCommand("docker login -u admin -p password -e auto-test@jfrog.com artifactory.local:5002", false)
+        dockerContainer.doCreate()
+        dockerContainer.startConfig.withPrivileges().addLink(artName, "artifactory.local").addLink(artName, "artifactory2.local").addLink(artName, "artifactory2.remote")
+
+        when:
+        def dockerLogs = dockerContainer.doStart(60).logs()
+
+        then:
+        dockerLogs.find("Login Succeeded")
+
+        cleanup:
         if (dockerContainer) {
             dockerContainer.doDelete(true, true)
         }
+
+    }
+
+    def setup() {
+        dockerImage = getDockerClientForTesting()
+        dockerContainer = dockerImage.getNewContainer()
+        artName = artifactoryContainer.inspect().Name
+    }
+
+    private DockerImage getDockerClientForTesting() {
+        dockerClient.image().registry("frogops-docker-dockerv2-local.artifactoryonline.com").repository("docker").tag("1.6.2").doCreate()
     }
 
     @Override
     String getDockerRepository() {
         return "artifactory-registry"
+    }
+
+    def setRepositoryToForceAuthentication(String repoKey) {
+        Map body = [
+                "dockerApiVersion"         : "V2",
+                "forceDockerAuthentication": true
+        ]
+
+        ArtifactoryRequest ar = new ArtifactoryRequestImpl()
+                .apiUrl("api/repositories/$repoKey")
+                .method(ArtifactoryRequest.Method.POST)
+                .requestType(ArtifactoryRequest.ContentType.JSON)
+                .responseType(ArtifactoryRequest.ContentType.TEXT)
+                .requestBody(body)
+
+        artifactoryAdmin.restCall(ar)
     }
 }

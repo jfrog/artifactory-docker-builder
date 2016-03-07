@@ -60,7 +60,7 @@ class ArtifactoryTask extends BaseTask {
                 openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/demo.key -out /etc/nginx/ssl/demo.pem -days 356 \\\n' +
                     '    -subj "/C=US/ST=California/L=SantaClara/O=IT/CN=localhost"'
             dfb.add this.getClass().getResource("nginx/artifactoryDocker.conf").path, "/etc/nginx/conf.d/default.conf"
-            dfb.expose 80, 443, 5000, 5001, 5002
+            dfb.expose 80, 443, 5000, 5001, 5002, 5003
         }
         dfb.expose 8081
         dfb.add this.getClass().getResource("artifactory/runArtifactory.sh").path, "/tmp/"

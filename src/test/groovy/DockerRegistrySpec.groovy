@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.jfrog.artifactory.client.ArtifactoryRequest
-import org.jfrog.artifactory.client.impl.ArtifactoryRequestImpl
 import org.jfrog.util.docker.DockerContainer
 import org.jfrog.util.docker.DockerImage
+import spock.lang.Unroll
 
 class DockerRegistrySpec extends DockerProSpec {
 
@@ -51,14 +50,14 @@ class DockerRegistrySpec extends DockerProSpec {
         }
     }
 
-    def "Docker Login Test"() {
+    @Unroll("Docker Login Test With Port #port")
+    def "Docker Login Test With Ports"() {
         setup:
-        setRepositoryToForceAuthentication("docker-dev-local2")
         dockerContainer.createConfig
-                .addEnv("DOCKER_DAEMON_ARGS", "--insecure-registry artifactory.local:5002")
-                .addCommand("docker login -u admin -p password -e auto-test@jfrog.com artifactory.local:5002", false)
+                .addEnv("DOCKER_DAEMON_ARGS", "--insecure-registry artifactory.local:" + port)
+                .addCommand("docker login -u admin -p password -e auto-test@jfrog.com artifactory.local:" + port, false)
         dockerContainer.doCreate()
-        dockerContainer.startConfig.withPrivileges().addLink(artName, "artifactory.local").addLink(artName, "artifactory2.local").addLink(artName, "artifactory2.remote")
+        dockerContainer.startConfig.withPrivileges().addLink(artName, "artifactory.local")
 
         when:
         def dockerLogs = dockerContainer.doStart(60).logs()
@@ -71,6 +70,38 @@ class DockerRegistrySpec extends DockerProSpec {
             dockerContainer.doDelete(true, true)
         }
 
+        where:
+        port | _
+        5001 | _
+        5002 | _
+        5003 | _
+    }
+
+    @Unroll("Docker Login Test With Sub-Domain #subdomain")
+    def "Docker Login Test With Sub-Domains"() {
+        setup:
+        dockerContainer.createConfig
+                .addEnv("DOCKER_DAEMON_ARGS", "--insecure-registry "+subdomain+".art.local")
+                .addCommand("docker login -u admin -p password -e auto-test@jfrog.com "+subdomain+".art.local", false)
+        dockerContainer.doCreate()
+        dockerContainer.startConfig.withPrivileges().addLink(artName, subdomain+".art.local")
+
+        when:
+        def dockerLogs = dockerContainer.doStart(60).logs()
+
+        then:
+        dockerLogs.find("Login Succeeded")
+
+        cleanup:
+        if (dockerContainer) {
+            dockerContainer.doDelete(true, true)
+        }
+
+        where:
+        subdomain            | _
+        "docker-dev-local2"  | _
+        "docker-prod-local2" | _
+        "dockerv2"           | _
     }
 
     def setup() {
@@ -86,21 +117,5 @@ class DockerRegistrySpec extends DockerProSpec {
     @Override
     String getDockerRepository() {
         return "artifactory-registry"
-    }
-
-    def setRepositoryToForceAuthentication(String repoKey) {
-        Map body = [
-                "dockerApiVersion"         : "V2",
-                "forceDockerAuthentication": true
-        ]
-
-        ArtifactoryRequest ar = new ArtifactoryRequestImpl()
-                .apiUrl("api/repositories/$repoKey")
-                .method(ArtifactoryRequest.Method.POST)
-                .requestType(ArtifactoryRequest.ContentType.JSON)
-                .responseType(ArtifactoryRequest.ContentType.TEXT)
-                .requestBody(body)
-
-        artifactoryAdmin.restCall(ar)
     }
 }

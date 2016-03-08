@@ -81,10 +81,10 @@ class DockerRegistrySpec extends DockerProSpec {
     def "Docker Login Test With Sub-Domains"() {
         setup:
         dockerContainer.createConfig
-                .addEnv("DOCKER_DAEMON_ARGS", "--insecure-registry "+subdomain+".art.local")
-                .addCommand("docker login -u admin -p password -e auto-test@jfrog.com "+subdomain+".art.local", false)
+                .addEnv("DOCKER_DAEMON_ARGS", "--insecure-registry " + subdomain + ".art.local")
+                .addCommand("docker login -u admin -p password -e auto-test@jfrog.com " + subdomain + ".art.local", false)
         dockerContainer.doCreate()
-        dockerContainer.startConfig.withPrivileges().addLink(artName, subdomain+".art.local")
+        dockerContainer.startConfig.withPrivileges().addLink(artName, subdomain + ".art.local")
 
         when:
         def dockerLogs = dockerContainer.doStart(60).logs()
@@ -101,7 +101,7 @@ class DockerRegistrySpec extends DockerProSpec {
         subdomain            | _
         "docker-dev-local2"  | _
         "docker-prod-local2" | _
-        "dockerv2"           | _
+        "docker-virtual"     | _
     }
 
     def setup() {

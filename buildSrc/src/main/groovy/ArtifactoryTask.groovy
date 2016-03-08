@@ -83,6 +83,7 @@ class ArtifactoryTask extends BaseTask {
         }
         dfb.run 'mkdir -p /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup} && ' +
             'chown -R artifactory: /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup}'
+        dfb.env 'ARTIFACTORY_HOME', "/var/opt/jfrog/artifactory"
         dfb.cmd "/tmp/runArtifactory.sh"
         if (enableNginx) {
             dfb.add this.getClass().getResource("artifactory/artifactory.config.xml").path, '/etc/opt/jfrog/artifactory/artifactory.config.xml'

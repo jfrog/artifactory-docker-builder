@@ -390,7 +390,7 @@
     </remoteRepositories>
     <virtualRepositories>
         <virtualRepository>
-            <key>dockerv2</key>
+            <key>docker-virtual</key>
             <type>docker</type>
             <includesPattern>**/*</includesPattern>
             <repoLayoutRef>simple-default</repoLayoutRef>

@@ -56,48 +56,61 @@ class ArtifactoryTask extends BaseTask {
         dfb.from centosImage.getFullImageName()
         dfb.maintainer "matank@jfrog.com"
         if (enableNginx) {
-            dfb.run'yum install -y nginx && mkdir -p /etc/nginx/ssl && \
+            dfb.run 'yum install -y nginx && mkdir -p /etc/nginx/ssl && \
                 openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/demo.key -out /etc/nginx/ssl/demo.pem -days 356 \\\n' +
                     '    -subj "/C=US/ST=California/L=SantaClara/O=IT/CN=localhost"'
             dfb.add this.getClass().getResource("nginx/artifactoryDocker.conf").path, "/etc/nginx/conf.d/default.conf"
-            dfb.expose 80, 443, 5000, 5001, 5002, 5003
         }
-        dfb.expose 8081
-        dfb.add this.getClass().getResource("artifactory/runArtifactory.sh").path, "/tmp/"
+        exposePorts(dfb)
+        if (enableNginx) {
+            dfb.add this.getClass().getResource("artifactory/runArtifactoryWithNginx.sh").path, "/tmp/run.sh"
+        } else {
+            dfb.add this.getClass().getResource("artifactory/runArtifactory.sh").path, "/tmp/run.sh"
+        }
         def artifactoryPackage = null
         if (artifactoryVersion != "latest" && Integer.parseInt(artifactoryVersion[0]) < 4) {
             artifactoryPackage = "artifactory"
         } else {
-            artifactoryPackage = "jfrog-artifactory-"+artifactoryType
+            artifactoryPackage = "jfrog-artifactory-" + artifactoryType
         }
         if (artifactoryVersion == "latest" || Integer.parseInt(artifactoryVersion[0]) >= 4) {
-            dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" --enablerepo="Artifactory-'+artifactoryType+
-                    '" '+artifactoryPackage+(artifactoryVersion == "latest" ? "" : "-"+artifactoryVersion)
+            dfb.run 'chmod +x /tmp/run.sh && yum install -y --disablerepo="*" --enablerepo="Artifactory-' + artifactoryType +
+                    '" ' + artifactoryPackage + (artifactoryVersion == "latest" ? "" : "-" + artifactoryVersion)
         } else {
             if (artifactoryType == "oss") {
-                dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-'+artifactoryType+'/artifactory-'+artifactoryVersion+'.rpm'
+                dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-' + artifactoryType + '/artifactory-' + artifactoryVersion + '.rpm'
             } else {
-                dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-'+artifactoryType+'/org/artifactory/powerpack/artifactory-powerpack-rpm/'+
-                        artifactoryVersion+'/artifactory-powerpack-rpm-'+artifactoryVersion+'.rpm'
+                dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-' + artifactoryType + '/org/artifactory/powerpack/artifactory-powerpack-rpm/' +
+                        artifactoryVersion + '/artifactory-powerpack-rpm-' + artifactoryVersion + '.rpm'
             }
         }
         dfb.run 'mkdir -p /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup} && ' +
-            'chown -R artifactory: /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup}'
+                'chown -R artifactory: /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup} && mkdir -p /var/opt/jfrog/artifactory/defaults/etc && ' +
+                'cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
         dfb.env 'ARTIFACTORY_HOME', "/var/opt/jfrog/artifactory"
-        dfb.cmd "/tmp/runArtifactory.sh"
+        dfb.cmd "/tmp/run.sh"
         if (enableNginx) {
             dfb.add this.getClass().getResource("artifactory/artifactory.config.xml").path, '/etc/opt/jfrog/artifactory/artifactory.config.xml'
         }
+        dfb.label(dfb.toString().replace("\n", "\\\n"))
 
         dfb.create()
 
+    }
+
+    private DockerFileBuilder exposePorts(DockerFileBuilder dfb) {
+        List portsToExpose = [8081]
+        if (enableNginx) {
+            portsToExpose.addAll([80, 443, 5000, 5001, 5002, 5003, 8001])
+        }
+        dfb.expose(portsToExpose as int[])
     }
 
     private void initArtifactoryImage() {
         this.artifactoryImage = dockerClient.image()
                 .registry(registry)
                 .namespace(dockerNamespace)
-                .repository("artifactory-"+(enableNginx ? "registry" : artifactoryType))
+                .repository("artifactory-" + (enableNginx ? "registry" : artifactoryType))
                 .tag(artifactoryVersion)
     }
 
@@ -121,7 +134,7 @@ class ArtifactoryTask extends BaseTask {
         }
 
         int portBound = 8888
-        DockerContainer artifactoryContainer = artifactoryImage.getNewContainer("artifactory-"+artifactoryType)
+        DockerContainer artifactoryContainer = artifactoryImage.getNewContainer("artifactory-" + artifactoryType)
         artifactoryContainer.startConfig.addPortBinding(8081, "tcp", "0.0.0.0", portBound)
 
         try {
@@ -135,7 +148,7 @@ class ArtifactoryTask extends BaseTask {
 
         try {
             if (artifactoryType != "oss") {
-                artifactoryContainer.startConfig.addBinds(artifactoryLicense.path, ARTIFACTORY_HOME+"/etc/artifactory.lic")
+                artifactoryContainer.startConfig.addBinds(artifactoryLicense.path, ARTIFACTORY_HOME + "/etc/artifactory.lic")
                 println "TEST: using license located at ${ARTIFACTORY_HOME}etc/artifactory.lic"
             }
 
@@ -162,7 +175,7 @@ class ArtifactoryTask extends BaseTask {
             sleep 1000
             maxTimeToWaitInSec--
         }
-        throw new TaskValidationException("Artifactory "+artifactoryType+" is not up")
+        throw new TaskValidationException("Artifactory " + artifactoryType + " is not up")
     }
 
     private void pushArtifactoryImage() {

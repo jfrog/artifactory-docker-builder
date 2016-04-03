@@ -56,9 +56,9 @@ class ArtifactoryTask extends BaseTask {
         dfb.from centosImage.getFullImageName()
         dfb.maintainer "matank@jfrog.com"
         if (enableNginx) {
-            dfb.run 'yum install -y nginx && mkdir -p /etc/nginx/ssl && \
-                openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/demo.key -out /etc/nginx/ssl/demo.pem -days 356 \\\n' +
-                    '    -subj "/C=US/ST=California/L=SantaClara/O=IT/CN=localhost"'
+            dfb.run 'yum install -y nginx && mkdir -p /etc/nginx/ssl && \\\n\
+openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/demo.key -out /etc/nginx/ssl/demo.pem -days 356 \\\n\
+-subj "/C=US/ST=California/L=SantaClara/O=IT/CN=*.art.local"'
             dfb.add this.getClass().getResource("nginx/artifactoryDocker.conf").path, "/etc/nginx/conf.d/default.conf"
         }
         exposePorts(dfb)

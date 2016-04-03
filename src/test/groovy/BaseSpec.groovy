@@ -57,7 +57,9 @@ abstract class BaseSpec extends Specification {
         artifactoryVersion = System.getProperty("ARTIFACTORY_VERSION")
         def tag = System.getProperty("pushLatest").toBoolean() ? "latest" : artifactoryVersion
         artifactoryImage = dockerClient.image().registry(bintrayRegistry).namespace(dockerNamespace).repository(getDockerRepository()).tag(tag).doCreate()
-        artifactoryContainer = artifactoryImage.getNewContainer().doCreate()
+        artifactoryContainer = artifactoryImage.getNewContainer()
+        artifactoryContainer.createConfig.addEnv("RUNTIME_OPTS", "-Djava.security.egd=file:/dev/./urandom")
+        artifactoryContainer.doCreate()
         artifactoryContainer.startConfig.addPortBinding(8081, "tcp", "0.0.0.0", 8081)
         artifactoryContainer.doStart()
         waitForArtifactory()
@@ -69,6 +71,15 @@ abstract class BaseSpec extends Specification {
         version = artifactoryAdmin.system().version()
         then:
         version.version == artifactoryVersion
+    }
+
+    def "Check RUNTIME_OPTS Affects Artifactory"() {
+        setup:
+        String env = "-Djava.security.egd=file:/dev/./urandom"
+        when:
+        def processes = artifactoryContainer.top().Processes
+        then:
+        checkIfEnvExists(processes, env)
     }
 
     def cleanupSpec() {
@@ -97,4 +108,10 @@ abstract class BaseSpec extends Specification {
     }
 
     abstract String getDockerRepository();
+
+    def checkIfEnvExists(List processes, String env) {
+        return processes.findAll() { process ->
+            process[-1].contains(env)
+        }
+    }
 }

@@ -32,3 +32,6 @@ It is always good practice to test and verify your images before distributing. <
 This project runs a sanity test after the image has been built, which is a precondition to push to artifactory. <br>
 For the pro version artifactory license must be places under 'artifactory-docker-builder/buildSrc/src/main/resources/artifactory/artifactory.lic'. <br>
 As final step after the image has been published to bintray, the latest tags are being downloaded and verified accordingly, the pro version requires the license to be placed under 'artifactory-docker-builder/src/test/resources/artifactory.lic'
+
+###Examples
+Examples for the Dockerfiles of each Artifactory images (Oss, Pro and Registry) can be found in [examples](examples) 

@@ -39,8 +39,11 @@ class CentosTask extends BaseTask{
 
         dfb.from centosBaseImage.getFullImageName()
         dfb.maintainer "matank@jfrog.com"
+        dfb.label("Add Artifactory repositories")
         dfb.add reposFilesToCopy(), "/etc/yum.repos.d/"
-        dfb.run "rm -rf /etc/yum.repos.d/Centos* && yum install java-1.8.0-openjdk-devel rsync net-tools -y && yum clean all" //Install pre-requisites
+        dfb.run "rm -rf /etc/yum.repos.d/Centos* && \\\n\
+yum install java-1.8.0-openjdk-devel rsync net-tools -y && \\\n\
+yum clean all" //Install pre-requisites
 
         dfb.create()
     }

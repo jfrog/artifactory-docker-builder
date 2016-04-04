@@ -55,8 +55,10 @@ class ArtifactoryTask extends BaseTask {
 
         dfb.from centosImage.getFullImageName()
         dfb.maintainer "matank@jfrog.com"
+        dfb.label("Install Nginx and create certificate valid for the domain *.art.local")
         if (enableNginx) {
-            dfb.run 'yum install -y nginx && mkdir -p /etc/nginx/ssl && \\\n\
+            dfb.run 'yum install -y nginx && \
+mkdir -p /etc/nginx/ssl && \\\n\
 openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/demo.key -out /etc/nginx/ssl/demo.pem -days 356 \\\n\
 -subj "/C=US/ST=California/L=SantaClara/O=IT/CN=*.art.local"'
             dfb.add this.getClass().getResource("nginx/artifactoryDocker.conf").path, "/etc/nginx/conf.d/default.conf"
@@ -78,21 +80,24 @@ openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/demo.key -out /
                     '" ' + artifactoryPackage + (artifactoryVersion == "latest" ? "" : "-" + artifactoryVersion)
         } else {
             if (artifactoryType == "oss") {
-                dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-' + artifactoryType + '/artifactory-' + artifactoryVersion + '.rpm'
+                dfb.run 'chmod +x /tmp/runArtifactory.sh && \
+yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-' + artifactoryType + '/artifactory-' + artifactoryVersion + '.rpm'
             } else {
-                dfb.run 'chmod +x /tmp/runArtifactory.sh && yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-' + artifactoryType + '/org/artifactory/powerpack/artifactory-powerpack-rpm/' +
+                dfb.run 'chmod +x /tmp/runArtifactory.sh && \
+yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-' + artifactoryType + '/org/artifactory/powerpack/artifactory-powerpack-rpm/' +
                         artifactoryVersion + '/artifactory-powerpack-rpm-' + artifactoryVersion + '.rpm'
             }
         }
-        dfb.run 'mkdir -p /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup} && ' +
-                'chown -R artifactory: /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup} && mkdir -p /var/opt/jfrog/artifactory/defaults/etc && ' +
-                'cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
+        dfb.label("Create Folders that aren't exists, and make sure they are owned by Artifactory, \\\n\
+Without this action, Artifactory will not be able to write to external mounts")
+        dfb.run 'mkdir -p /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup} && \\\n\
+chown -R artifactory: /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup} && mkdir -p /var/opt/jfrog/artifactory/defaults/etc && \\\n\
+cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
         dfb.env 'ARTIFACTORY_HOME', "/var/opt/jfrog/artifactory"
         dfb.cmd "/tmp/run.sh"
         if (enableNginx) {
             dfb.add this.getClass().getResource("artifactory/artifactory.config.xml").path, '/etc/opt/jfrog/artifactory/artifactory.config.xml'
         }
-        dfb.label(dfb.toString().replace("\n", "\\\n"))
 
         dfb.create()
 

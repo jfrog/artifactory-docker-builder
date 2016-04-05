@@ -1,22 +1,22 @@
 #Artifactory Docker image builder
-###This project is a nice template to build & push artifactory docker images to artifactory docker registry and publish to bintray for distribution:
+###This project serves as a template you can use to build Artifactory Docker images, push them to an Artifactory Docker registry, and from them, publish them to bintray for distribution:
 
 ###General:
-This project is gradle-groovy based using [docker-remote-util](https://github.com/JFrogDev/docker-remote-util) library to interact with docker remote API.
+The project is Gradle-Groovy based using JFrog's [docker-remote-util](https://github.com/JFrogDev/docker-remote-util) library to interact with the Docker Remote API.
 
 ##Public Usage:
-./gradlew createArtifactoryOss -Partifactory_version=3.9.2 - Builds artifactory OSS 3.9.2 on a centos-6.6 with openjdk-1.8.0 <br>
-./gradlew createArtifactoryRegistry - Builds artifactory pro latest version ready as docker registry
+./gradlew createArtifactoryOss -Partifactory_version=3.9.2 - Builds Artifactory OSS 3.9.2 on a centos-6.6 with openjdk-1.8.0 <br>
+./gradlew createArtifactoryRegistry - Builds the latest version of Artifactory Pro preconfigured as a Docker registry
 
 ###Gradle Tasks:
-1. createCentos - Create base centos image for artifactory
-2. createArtifactoryOss - Create clean artifactory oss image
-3. createArtifactoryPro - Create clean artifactory pro image
-4. createArtifactoryRegistry - Create artifactory image with nginx and docker registry configured
-5. publishImagesToBintray - Push tag/latest from Artifactory  to Bintray "https://bintray.com/jfrog/reg2"
-6. test - Download the latest tag from bintray and run sanity test on the image
-7. createAll - Builds artifactory of each type (Oss, Pro, Docker-registry)
-8. release - Running all tasks
+1. createCentos - Creates the base Centos image for Artifactory
+2. createArtifactoryOss - Creates a clean Artifactory OSS image
+3. createArtifactoryPro - Creates a clean Artifactory Pro image
+4. createArtifactoryRegistry - Creates an Artifactory image with NGINX and pre-configured with a Docker registry 
+5. publishImagesToBintray - Pushes tag/latest from Artifactory  to Bintray repository "https://bintray.com/jfrog/reg2"
+6. test - Downloads the latest tag from bintray and runs a sanity test on the image
+7. createAll - Builds each type of Artifactory Docker image (Oss, Pro, Docker-registry)
+8. release - Runs all tasks
 
 ###Project Properties:
 1. artifactory_version - the requested artifactory version to build, Default: latest available release version
@@ -28,10 +28,10 @@ This project is gradle-groovy based using [docker-remote-util](https://github.co
 7. bintray_registry - Bintray Docker registry
 
 ###Prerequisities
-It is always good practice to test and verify your images before distributing. <br>
-This project runs a sanity test after the image has been built, which is a precondition to push to artifactory. <br>
-For the pro version artifactory license must be places under 'artifactory-docker-builder/buildSrc/src/main/resources/artifactory/artifactory.lic'. <br>
-As final step after the image has been published to bintray, the latest tags are being downloaded and verified accordingly, the pro version requires the license to be placed under 'artifactory-docker-builder/src/test/resources/artifactory.lic'
+It is always good practice to test and verify your images before distributing them. <br>
+Before pushing an image to Artifactory, this project runs a sanity test on it. <br>
+For the Pro version, the Artifactory license must be placed under 'artifactory-docker-builder/buildSrc/src/main/resources/artifactory/artifactory.lic'. <br>
+As a final step after the image has been published to Bintray, the latest tags are downloaded and verified accordingly. The pro version requires the license to be placed under 'artifactory-docker-builder/src/test/resources/artifactory.lic'
 
 ###Examples
-Examples for the Dockerfiles of each Artifactory images (Oss, Pro and Registry) can be found in [examples](examples) 
+Examples of the Dockerfiles for each Artifactory image (Oss, Pro and Registry) can be found in [examples](examples) 

@@ -2,7 +2,7 @@
 
 ##Examples
 
-Here you can find Dockerfiles to build the latest image of each Artifactory type.
+These examples provide Dockerfiles you can use to build the latest image of each Artifactory type.
 
 ##Build
 

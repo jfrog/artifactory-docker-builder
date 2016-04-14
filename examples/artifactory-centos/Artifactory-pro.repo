@@ -1,4 +1,4 @@
 [Artifactory-pro]
 name=Artifactory-pro
-baseurl=https://frogops.artifactoryonline.com/frogops/artifactory-pro/
+baseurl=https://frogops.jfrog.io/frogops/artifactory-pro/
 gpgcheck=0

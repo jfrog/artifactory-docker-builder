@@ -26,7 +26,7 @@ class DockerRegistrySpec extends DockerProSpec {
 
     def "Push DOCKER image to local repositories"() {
         setup:
-        DockerImage testImage = dockerClient.image().registry("frogops-docker-dockerv2-local.artifactoryonline.com").namespace("templates").repository("busybox").tag("latest")
+        DockerImage testImage = dockerClient.image().registry("frogops-dockerv2.jfrog.io").namespace("templates").repository("busybox").tag("latest")
         DockerImage deployImage = dockerClient.image().registry("artifactory.local:5001").namespace("templates").repository("busybox").tag("latest")
         this.dockerContainer.createConfig
                 .addEnv("DOCKER_DAEMON_ARGS", "--insecure-registry artifactory.local:5001")
@@ -111,7 +111,7 @@ class DockerRegistrySpec extends DockerProSpec {
     }
 
     private DockerImage getDockerClientForTesting() {
-        dockerClient.image().registry("frogops-docker-dockerv2-local.artifactoryonline.com").repository("docker").tag("1.6.2").doCreate()
+        dockerClient.image().registry("frogops-dockerv2.jfrog.io").repository("docker").tag("1.6.2").doCreate()
     }
 
     @Override

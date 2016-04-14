@@ -38,6 +38,7 @@ class CentosTask extends BaseTask{
         dfb = new DockerFileBuilder(project.projectDir.absolutePath + "/tmp")
 
         dfb.from centosBaseImage.getFullImageName()
+        dfb.label "This is the official Centos image"
         dfb.maintainer "matank@jfrog.com"
         dfb.label("Add Artifactory repositories")
         dfb.add reposFilesToCopy(), "/etc/yum.repos.d/"

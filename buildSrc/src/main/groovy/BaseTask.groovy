@@ -57,8 +57,7 @@ abstract class BaseTask extends DefaultTask {
      */
     DockerImage initCentosBaseImage() {
         dockerClient.image()
-                .registry("frogops-dockerv2-local.jfrog.io")
-                .namespace("os")
+                .registry(registry)
                 .repository("centos")
                 .tag("6.6")
     }

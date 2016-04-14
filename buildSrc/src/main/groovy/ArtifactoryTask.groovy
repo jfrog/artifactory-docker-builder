@@ -81,10 +81,10 @@ openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/demo.key -out /
         } else {
             if (artifactoryType == "oss") {
                 dfb.run 'chmod +x /tmp/runArtifactory.sh && \
-yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-' + artifactoryType + '/artifactory-' + artifactoryVersion + '.rpm'
+yum install -y --disablerepo="*" http://frogops.jfrog.io/frogops/artifactory-' + artifactoryType + '/artifactory-' + artifactoryVersion + '.rpm'
             } else {
                 dfb.run 'chmod +x /tmp/runArtifactory.sh && \
-yum install -y --disablerepo="*" http://frogops.artifactoryonline.com/frogops/artifactory-' + artifactoryType + '/org/artifactory/powerpack/artifactory-powerpack-rpm/' +
+yum install -y --disablerepo="*" http://frogops.jfrog.io/frogops/artifactory-' + artifactoryType + '/org/artifactory/powerpack/artifactory-powerpack-rpm/' +
                         artifactoryVersion + '/artifactory-powerpack-rpm-' + artifactoryVersion + '.rpm'
             }
         }

@@ -1,4 +1,4 @@
 [Artifactory-oss]
 name=Artifactory-oss
-baseurl=https://frogops.artifactoryonline.com/frogops/artifactory-oss/
+baseurl=https://frogops.jfrog.io/frogops/artifactory-oss/
 gpgcheck=0

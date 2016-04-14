@@ -1,5 +1,5 @@
 FROM frogops-dockerv2.jfrog.io/centos:6.6
-LABEL This is the official Centos image proxied from docker hub
+LABEL This is the official Centos image
 
 MAINTAINER matank@jfrog.com
 

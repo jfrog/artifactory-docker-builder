@@ -1,0 +1,4 @@
+[Artifactory-pro]
+name=Artifactory-pro
+baseurl=https://frogops.artifactoryonline.com/frogops/artifactory-pro/
+gpgcheck=0

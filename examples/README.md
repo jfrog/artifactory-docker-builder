@@ -6,6 +6,13 @@ Here you can find Dockerfiles to build the latest image of each Artifactory type
 
 ##Build
 
+###Artifactory-Centos
+[View Dockerfile](artifactory-centos/Dockerfile)
+
+`docker build -t frogops-dockerv2.jfrog.io/os/centos-artifactory:6.6 artifactory-centos`
+
+*This is the base image for all Artifactory images*
+
 ###Artifactory-OSS
 
 [View Dockerfile](artifactory-oss/Dockerfile)

@@ -1,0 +1,5 @@
+[Artifactory-centos]
+name=Artifactory-centos
+baseurl=https://frogops.artifactoryonline.com/frogops/centos/$releasever/os/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6

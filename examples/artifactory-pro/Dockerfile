@@ -1,4 +1,4 @@
-FROM frogops-dockerv2-local.jfrog.io/os/centos-artifactory:6.6
+FROM frogops-dockerv2.jfrog.io/os/centos-artifactory:6.6
 
 MAINTAINER matank@jfrog.com
 

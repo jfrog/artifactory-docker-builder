@@ -64,13 +64,24 @@ class BintrayPushTask extends BaseTask {
             image.tag("latest")
         }
         println "Publishing to bintray image: ${image.getFullImageName()}"
-        String name = image.getNamespace()+"/"+image.getRepository()+":"+image.getTag()
+        String dockerRepo = image.getNamespace() + "/" + image.getRepository()
+        String dockerTag = image.getTag()
+        String name = dockerRepo + ":" + dockerTag
         String path = "api/bintray/docker/push/$artifactoryRepo"
         ArtifactoryRequest ar = new ArtifactoryRequestImpl()
                 .method(ArtifactoryRequest.Method.POST)
                 .apiUrl(path)
                 .requestType(ArtifactoryRequest.ContentType.JSON)
-                .requestBody([dockerImage: name, bintraySubject: bintraySubject, bintrayRepo: bintrayRepo, async: false])
+                .requestBody(
+                [
+                        dockerImage     : name,
+                        dockerRepository: dockerRepo,
+                        dockerTagName   : dockerTag,
+                        bintraySubject  : bintraySubject,
+                        bintrayRepo     : bintrayRepo,
+                        async           : false
+                ]
+        )
         try {
             artifactory.restCall(ar)
         } catch (HttpResponseException e) {

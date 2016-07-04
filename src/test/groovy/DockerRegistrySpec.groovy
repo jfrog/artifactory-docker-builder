@@ -31,18 +31,19 @@ class DockerRegistrySpec extends DockerProSpec {
         this.dockerContainer.createConfig
                 .addEnv("DOCKER_DAEMON_ARGS", "--insecure-registry artifactory.local:5001")
                 .addCommand(
-                "docker pull " + testImage.getFullImageName() + "; " +
-                        "docker tag " + testImage.getFullImageName() + " " + deployImage.getFullImageName() + "; " +
-                        "curl  -uadmin:password https://artifactory.local:5001/v1/auth -k > ~/.dockercfg ; " +
-                        "docker push " + deployImage.getFullImageName(), false)
+                "docker pull ${testImage.getFullImageName()}; " +
+                        "docker tag ${testImage.getFullImageName()} ${deployImage.getFullImageName()}; " +
+                        "docker login -u admin -p password ${deployImage.getRegistry().registryHost} ; " +
+                        "docker push ${deployImage.getFullImageName()}", false)
+
         this.dockerContainer.doCreate()
         this.dockerContainer.startConfig.withPrivileges().addLink(this.artName, "artifactory.local").addLink(this.artName, "artifactory2.local").addLink(this.artName, "artifactory2.remote")
 
         when:
-        def dockerLogs = this.dockerContainer.doStart(600).logs()
+        this.dockerContainer.doStart(600)
 
         then:
-        dockerLogs.find(/job push\(${deployImage.getFullImageName(false)}\) = OK \(0\)/)
+        this.dockerContainer.inspect().State.ExitCode.toInteger() == 0
 
         cleanup:
         if (this.dockerContainer) {
@@ -60,10 +61,10 @@ class DockerRegistrySpec extends DockerProSpec {
         dockerContainer.startConfig.withPrivileges().addLink(artName, "artifactory.local")
 
         when:
-        def dockerLogs = dockerContainer.doStart(60).logs()
+        dockerContainer.doStart(60)
 
         then:
-        dockerLogs.find("Login Succeeded")
+        this.dockerContainer.inspect().State.ExitCode.toInteger() == 0
 
         cleanup:
         if (dockerContainer) {
@@ -87,10 +88,10 @@ class DockerRegistrySpec extends DockerProSpec {
         dockerContainer.startConfig.withPrivileges().addLink(artName, subdomain + ".art.local")
 
         when:
-        def dockerLogs = dockerContainer.doStart(60).logs()
+        dockerContainer.doStart(60)
 
         then:
-        dockerLogs.find("Login Succeeded")
+        this.dockerContainer.inspect().State.ExitCode.toInteger() == 0
 
         cleanup:
         if (dockerContainer) {
@@ -107,11 +108,12 @@ class DockerRegistrySpec extends DockerProSpec {
     def setup() {
         dockerImage = getDockerClientForTesting()
         dockerContainer = dockerImage.getNewContainer()
+        dockerContainer.createConfig.setEntrypoint(["/usr/local/bin/wrapdocker"])
         artName = artifactoryContainer.inspect().Name
     }
 
     private DockerImage getDockerClientForTesting() {
-        dockerClient.image().registry("frogops-dockerv2.jfrog.io").repository("docker").tag("1.6.2").doCreate()
+        dockerClient.image().registry("frogops-dockerv2.jfrog.io").repository("docker").tag("1.11.2").doCreate()
     }
 
     @Override

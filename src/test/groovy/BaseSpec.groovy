@@ -103,8 +103,7 @@ abstract class BaseSpec extends Specification {
     }
 
     def String getHostFromDockerUrl() {
-        def host = dockerUrl.find(/https?:\/\/(.*):.*/) { match -> return match[1] }
-        return host
+        return new URI(dockerUrl).host
     }
 
     abstract String getDockerRepository();

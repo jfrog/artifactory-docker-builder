@@ -20,14 +20,14 @@ apply plugin: 'idea'
 
 version = '1.0'
 
-def artifactoryVersion = project.hasProperty("artifactory_version") ? artifactory_version : ""
-def dockerUrl = project.hasProperty("DOCKER_URL") ? DOCKER_URL : "http://localhost:4243/"
+def artifactoryVersion = getProjectProperty("artifactory_version") ?: "latest"
+def dockerUrl = getProjectProperty("DOCKER_URL") ?: "http://localhost:4243/"
 
-def artifactoryType = project.hasProperty("ARTIFACTORY_TYPE") ? ARTIFACTORY_TYPE : "pro"
+def artifactoryType = getProjectProperty("ARTIFACTORY_TYPE") ?: "pro"
 
-def os = project.hasProperty("OS") ? OS : "centos:6.6"
-def registry = project.hasProperty("registry") ? registry : System.getenv("registry")
-def artifactory_dependenciesUrl = project.hasProperty("artifactory_dependenciesUrl") ? artifactory_dependenciesUrl : System.getenv("artifactory_dependenciesUrl")
+def os = getProjectProperty("OS") ?: "centos:6.6"
+def registry = System.getenv("registry") ?: getProjectProperty("registry")
+def artifactory_dependenciesUrl = System.getenv("artifactory_dependenciesUrl") ?: getProjectProperty("artifactory_dependenciesUrl")
 
 buildscript {
 
@@ -38,7 +38,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.jfrog.artifactory.client:artifactory-java-client-services:0.18-SNAPSHOT'
+        classpath 'org.jfrog.artifactory.client:artifactory-java-client-services:1.2.2'
     }
 }
 
@@ -123,6 +123,18 @@ test {
     systemProperty 'pushLatest', project.hasProperty('pushLatest') ? pushLatest : false
 
     maxParallelForks = 1
+}
+
+def getProjectProperty(String property, boolean isMandatory = false) {
+    if (project.hasProperty(property)) {
+        return project.property(property)
+    } else {
+        if (isMandatory) {
+            throw new MissingPropertyException("$property is mandatory.")
+        } else {
+            return null
+        }
+    }
 }
 
 

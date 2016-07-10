@@ -59,7 +59,7 @@ yum clean all" //Install pre-requisites
     private def reposFilesToCopy() {
         def filesFullPaths = []
         new File(this.getClass().getResource("yum/repos").path).listFiles().each {
-x            filesFullPaths.add(it.absolutePath)
+            filesFullPaths.add(it.absolutePath)
         }
         return filesFullPaths
     }

@@ -8,7 +8,7 @@ ADD runArtifactory.sh /tmp/run.sh
 RUN chmod +x /tmp/run.sh && \
     yum install -y --disablerepo="*" --enablerepo="Artifactory-oss" jfrog-artifactory-oss
 
-LABEL Create Folders that aren't exists, and make sure they are owned by Artifactory, \
+LABEL Create folders needed by Artifactory and set owner to artifactory user. \
 Without this action, Artifactory will not be able to write to external mounts
 RUN mkdir -p /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup} && \
     chown -R artifactory: /etc/opt/jfrog/artifactory /var/opt/jfrog/artifactory/{data,logs,backup} && \

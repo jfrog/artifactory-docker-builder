@@ -3,7 +3,7 @@ LABEL This is the official Centos image
 
 MAINTAINER matank@jfrog.com
 
-LABEL Add Artifactory repositories
+LABEL Add Artifactory Yum repositories
 ADD ["Artifactory-centos.repo","Artifactory-oss.repo","Artifactory-pro.repo","nginx.repo","/etc/yum.repos.d/"]
 
 RUN rm -rf /etc/yum.repos.d/Centos* && \

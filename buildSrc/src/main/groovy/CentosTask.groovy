@@ -50,6 +50,7 @@ yum clean all" //Install pre-requisites
     }
 
     void buildCentosImage() {
+        println "TASK INFO: Building ${centosImage.toString()}"
         dockerClient.build(dfb, centosImage)
         println dfb.getDockerfile().text
         dfb.close() //Close DockerFileBuilder to remove any leftovers files from the build process
@@ -58,7 +59,7 @@ yum clean all" //Install pre-requisites
     private def reposFilesToCopy() {
         def filesFullPaths = []
         new File(this.getClass().getResource("yum/repos").path).listFiles().each {
-            filesFullPaths.add(it.absolutePath)
+x            filesFullPaths.add(it.absolutePath)
         }
         return filesFullPaths
     }

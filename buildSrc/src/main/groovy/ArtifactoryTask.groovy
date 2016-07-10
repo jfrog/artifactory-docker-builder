@@ -115,6 +115,8 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
     }
 
     private void initArtifactoryImage() {
+        println "Using registry user: $registryUser"
+        println "Using registry password: $registryPassword"
         this.artifactoryImage = dockerClient.image()
                 .registry(new DockerRegistry(registry, registryUser, registryPassword))
                 .namespace(dockerNamespace)

@@ -27,6 +27,8 @@ def artifactoryType = getProjectProperty("ARTIFACTORY_TYPE") ?: "pro"
 
 def os = getProjectProperty("OS") ?: "centos:6.6"
 def registry = System.getenv("registry") ?: getProjectProperty("registry")
+def registryUser = System.getenv("registry_user") ?: getProjectProperty("registry_user")
+def registryPassword = System.getenv("registry_password") ?: getProjectProperty("registry_password")
 def artifactory_dependenciesUrl = System.getenv("artifactory_dependenciesUrl") ?: getProjectProperty("artifactory_dependenciesUrl")
 def build_number = getProjectProperty("BUILD_NUMBER")
 
@@ -88,6 +90,8 @@ task createCentos(type: CentosTask) {
 tasks.withType(BaseTask) {
     setHostUrl(dockerUrl)
     setRegistry(registry)
+    setRegistryUser(registryUser)
+    setRegistryPassword(registryPassword)
     setArtifactoryVersion(artifactoryVersion)
 }
 

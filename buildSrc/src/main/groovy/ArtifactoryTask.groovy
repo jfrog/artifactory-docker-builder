@@ -116,7 +116,7 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
 
     private void initArtifactoryImage() {
         this.artifactoryImage = dockerClient.image()
-                .registry(registry)
+                .registry(new DockerRegistry(registry, registryUser, registryPassword))
                 .namespace(dockerNamespace)
                 .repository("artifactory-" + (enableNginx ? "registry" : artifactoryType))
                 .tag(StringUtils.isNotEmpty(tag) ? tag : artifactoryVersion)

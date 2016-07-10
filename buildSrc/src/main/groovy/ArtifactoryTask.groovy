@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import org.apache.commons.lang.StringUtils
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskValidationException
 import org.jfrog.artifactory.client.Artifactory
@@ -33,6 +35,7 @@ class ArtifactoryTask extends BaseTask {
     boolean enableNginx = false
     boolean createLatestTag = false
     String dockerNamespace = null
+    String tag = null
 
     ArtifactoryTask() {
         description = "Build artifactory docker image"
@@ -55,8 +58,8 @@ class ArtifactoryTask extends BaseTask {
 
         dfb.from centosImage.getFullImageName()
         dfb.maintainer "matank@jfrog.com"
-        dfb.label("Install Nginx and create certificate valid for the domain *.art.local")
         if (enableNginx) {
+            dfb.label("Install Nginx and create certificate valid for the domain *.art.local")
             dfb.run 'yum install -y nginx && \
 mkdir -p /etc/nginx/ssl && \\\n\
 openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/demo.key -out /etc/nginx/ssl/demo.pem -days 356 \\\n\
@@ -77,7 +80,7 @@ openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/demo.key -out /
         }
         if (artifactoryVersion == "latest" || Integer.parseInt(artifactoryVersion[0]) >= 4) {
             dfb.run 'chmod +x /tmp/run.sh && yum install -y --disablerepo="*" --enablerepo="Artifactory-' + artifactoryType +
-                    '" ' + artifactoryPackage + (artifactoryVersion == "latest" ? "" : "-" + artifactoryVersion)
+                    '" ' + artifactoryPackage + getVersionToInstall()
         } else {
             if (artifactoryType == "oss") {
                 dfb.run 'chmod +x /tmp/runArtifactory.sh && \
@@ -116,7 +119,7 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
                 .registry(registry)
                 .namespace(dockerNamespace)
                 .repository("artifactory-" + (enableNginx ? "registry" : artifactoryType))
-                .tag(artifactoryVersion)
+                .tag(StringUtils.isNotEmpty(tag) ? tag : artifactoryVersion)
     }
 
     private void buildArtifactoryImage() {
@@ -190,8 +193,8 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
         if (pushToArtifactory) {
             artifactoryImage.registry(new DockerRegistry(
                     registry,
-                    project.hasProperty('artifactory_user') ? project.getProperty('artifactory_user') : System.getenv("artifactory_user"),
-                    project.hasProperty('artifactory_password') ? project.getProperty('artifactory_password') : System.getenv("artifactory_password")))
+                    regsitryUser,
+                    registryPassword))
             artifactoryImage.doPush()
 
             if (createLatestTag) {
@@ -230,5 +233,19 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
 
     void setDockerNamespace(String dockerNamespace) {
         this.dockerNamespace = dockerNamespace
+    }
+
+    void setTag(String tag) {
+        this.tag = tag
+    }
+
+    String getVersionToInstall() {
+        if (StringUtils.isNotBlank(tag)) {
+            return "-"+tag
+        }
+        if (artifactoryVersion == "latest") {
+            return ""
+        }
+        return "-" + artifactoryVersion
     }
 }

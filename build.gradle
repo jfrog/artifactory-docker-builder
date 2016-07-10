@@ -1,3 +1,5 @@
+import org.apache.commons.lang.StringUtils
+
 /*
  * Copyright (C) 2015 JFrog Ltd.
  *
@@ -27,7 +29,10 @@ def artifactoryType = project.hasProperty("ARTIFACTORY_TYPE") ? ARTIFACTORY_TYPE
 
 def os = project.hasProperty("OS") ? OS : "centos:6.6"
 def registry = project.hasProperty("registry") ? registry : System.getenv("registry")
+def registryUser = project.hasProperty("registry_user") ? registry_user : System.getenv("registry_user")
+def registryPassword = project.hasProperty("registry_password") ? registry_password : System.getenv("registry_password")
 def artifactory_dependenciesUrl = project.hasProperty("artifactory_dependenciesUrl") ? artifactory_dependenciesUrl : System.getenv("artifactory_dependenciesUrl")
+def build_number = project.hasProperty("build_number") ? build_number : ""
 
 buildscript {
 
@@ -87,6 +92,8 @@ task createCentos(type: CentosTask) {
 tasks.withType(BaseTask) {
     setHostUrl(dockerUrl)
     setRegistry(registry)
+    setRegsitryUser(registryUser)
+    setRegistryPassword(registryPassword)
     setArtifactoryVersion(artifactoryVersion)
 }
 
@@ -95,6 +102,9 @@ tasks.withType(ArtifactoryTask) {
     setPushToArtifactory(project.hasProperty('push_to_artifactory') ? push_to_artifactory.toBoolean() : false)
     setCreateLatestTag(project.hasProperty('latest_tag') ? latest_tag.toBoolean() : false)
     setDockerNamespace(project.hasProperty('docker_namespace') ? docker_namespace : System.getenv("docker_namespace"))
+    if ( artifactoryVersion == "4.x.devel" ) {
+        setTag(artifactoryVersion+(StringUtils.isNotBlank(build_number) ? "-"+build_number : ""))
+    }
 }
 
 task release(dependsOn: ['createArtifactoryOss', 'createArtifactoryPro','createArtifactoryRegistry','publishImagesToBintray','test']) {

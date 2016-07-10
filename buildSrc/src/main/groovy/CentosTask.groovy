@@ -51,11 +51,7 @@ yum clean all" //Install pre-requisites
     }
 
     void buildCentosImage() {
-        try{
-            centosImage.inspect()
-        } catch (HttpResponseException hre) {
-            dockerClient.build(dfb, centosImage)
-        }
+        dockerClient.build(dfb, centosImage)
         println dfb.getDockerfile().text
         dfb.close() //Close DockerFileBuilder to remove any leftovers files from the build process
     }

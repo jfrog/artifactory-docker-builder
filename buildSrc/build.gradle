@@ -22,13 +22,19 @@ import org.apache.tools.ant.filters.*
 
 def artifactory_dependenciesUrl = project.hasProperty("artifactory_dependenciesUrl") ? artifactory_dependenciesUrl : System.getenv("artifactory_dependenciesUrl")
 def artifactory_contextUrl = project.hasProperty("artifactory_contextUrl") ? artifactory_contextUrl : System.getenv("artifactory_contextUrl")
+def oss_repository = project.hasProperty("oss_repository") ? oss_repository : System.getenv("oss_repository")
+def pro_repository = project.hasProperty("pro_repository") ? pro_repository : System.getenv("pro_repository")
 
 processResources {
 
     filter ReplaceTokens, tokens: [
-            "artifactory_contextUrl": artifactory_contextUrl
+            "artifactory_contextUrl": artifactory_contextUrl,
+            "oss_repository": oss_repository,
+            "pro_repository": pro_repository
     ]
     println "contextUrl "+artifactory_contextUrl
+    println "artifactory-pro repository: "+pro_repository
+    println "artifactory-oss repository: "+oss_repository
 }
 
 version = '1.0'

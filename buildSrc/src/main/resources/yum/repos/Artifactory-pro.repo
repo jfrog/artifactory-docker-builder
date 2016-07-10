@@ -1,4 +1,4 @@
 [Artifactory-pro]
 name=Artifactory-pro
-baseurl=@artifactory_contextUrl@/artifactory-pro/
+baseurl=@artifactory_contextUrl@/@pro_repository@/
 gpgcheck=0

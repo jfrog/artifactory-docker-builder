@@ -28,6 +28,7 @@ def artifactoryType = getProjectProperty("ARTIFACTORY_TYPE") ?: "pro"
 def os = getProjectProperty("OS") ?: "centos:6.6"
 def registry = System.getenv("registry") ?: getProjectProperty("registry")
 def artifactory_dependenciesUrl = System.getenv("artifactory_dependenciesUrl") ?: getProjectProperty("artifactory_dependenciesUrl")
+def build_number = getProjectProperty("BUILD_NUMBER")
 
 buildscript {
 
@@ -95,6 +96,9 @@ tasks.withType(ArtifactoryTask) {
     setPushToArtifactory(project.hasProperty('push_to_artifactory') ? push_to_artifactory.toBoolean() : false)
     setCreateLatestTag(project.hasProperty('latest_tag') ? latest_tag.toBoolean() : false)
     setDockerNamespace(project.hasProperty('docker_namespace') ? docker_namespace : System.getenv("docker_namespace"))
+    if (build_number) {
+        setTag("$artifactoryVersion-$build_number")
+    }
 }
 
 task release(dependsOn: ['createArtifactoryOss', 'createArtifactoryPro','createArtifactoryRegistry','publishImagesToBintray','test']) {

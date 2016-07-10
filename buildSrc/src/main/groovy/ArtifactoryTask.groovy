@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import org.apache.commons.lang.StringUtils
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskValidationException
 import org.jfrog.artifactory.client.Artifactory
@@ -33,6 +35,7 @@ class ArtifactoryTask extends BaseTask {
     boolean enableNginx = false
     boolean createLatestTag = false
     String dockerNamespace = null
+    String tag = null
 
     ArtifactoryTask() {
         description = "Build artifactory docker image"
@@ -116,7 +119,7 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
                 .registry(registry)
                 .namespace(dockerNamespace)
                 .repository("artifactory-" + (enableNginx ? "registry" : artifactoryType))
-                .tag(artifactoryVersion)
+                .tag(StringUtils.isNotEmpty(tag) ? tag : artifactoryVersion)
     }
 
     private void buildArtifactoryImage() {
@@ -230,5 +233,9 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
 
     void setDockerNamespace(String dockerNamespace) {
         this.dockerNamespace = dockerNamespace
+    }
+
+    void setTag(String tag) {
+        this.tag = tag
     }
 }

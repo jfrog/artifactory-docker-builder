@@ -119,7 +119,7 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
                 .registry(registry)
                 .namespace(dockerNamespace)
                 .repository("artifactory-" + (enableNginx ? "registry" : artifactoryType))
-                .tag(StringUtils.isNotEmpty(tag) ? tag : artifactoryVersion)
+                .tag(getTagWithBuildNumber())
     }
 
     private void buildArtifactoryImage() {
@@ -193,7 +193,7 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
         if (pushToArtifactory) {
             artifactoryImage.registry(new DockerRegistry(
                     registry,
-                    regsitryUser,
+                    registryUser,
                     registryPassword))
             artifactoryImage.doPush()
 
@@ -240,12 +240,17 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
     }
 
     String getVersionToInstall() {
-        if (StringUtils.isNotBlank(tag)) {
-            return "-"+tag
-        }
         if (artifactoryVersion == "latest") {
             return ""
         }
-        return "-" + artifactoryVersion
+
+        return "-" + artifactoryVersion + (StringUtils.isNotBlank(artifactoryBuildNumber) ? "-" + artifactoryBuildNumber : "")
+    }
+
+    String getTagWithBuildNumber() {
+        String tagName
+
+        tagName = StringUtils.isNotBlank(tag) ? tag : artifactoryVersion
+        return tagName + (StringUtils.isNotBlank(artifactoryBuildNumber) ? "-" + artifactoryBuildNumber : "")
     }
 }

@@ -21,34 +21,48 @@ sourceCompatibility = 1.5
 import org.apache.tools.ant.filters.*
 
 def artifactory_dependenciesUrl = project.hasProperty("artifactory_dependenciesUrl") ? artifactory_dependenciesUrl : System.getenv("artifactory_dependenciesUrl")
-def artifactory_contextUrl = project.hasProperty("artifactory_contextUrl") ? artifactory_contextUrl : System.getenv("artifactory_contextUrl")
-def oss_repository = project.hasProperty("oss_repository") ? oss_repository : System.getenv("oss_repository")
-def pro_repository = project.hasProperty("pro_repository") ? pro_repository : System.getenv("pro_repository")
+def artifactory_contextUrl = System.getenv("artifactory_contextUrl") ?: getProjectProperty("artifactory_contextUrl", true)
+def oss_repository = System.getenv("oss_repository") ?: getProjectProperty("oss_repository", true)
+def pro_repository = System.getenv("pro_repository") ?: getProjectProperty("pro_repository", true)
 
 processResources {
 
     filter ReplaceTokens, tokens: [
             "artifactory_contextUrl": artifactory_contextUrl,
-            "oss_repository": oss_repository,
-            "pro_repository": pro_repository
+            "oss_repository"        : oss_repository,
+            "pro_repository"        : pro_repository
     ]
-    println "contextUrl "+artifactory_contextUrl
-    println "artifactory-pro repository: "+pro_repository
-    println "artifactory-oss repository: "+oss_repository
+    println "contextUrl " + artifactory_contextUrl
+    println "oss repository " + oss_repository
+    println "pro repository " + pro_repository
 }
 
 version = '1.0'
-    repositories {
-        maven {
-            url artifactory_dependenciesUrl
-        }
-        jcenter()
+repositories {
+    maven {
+        url artifactory_dependenciesUrl
     }
+    jcenter()
+}
 
-    dependencies {
-        gradleApi()
-        
-        compile 'org.codehaus.groovy:groovy-all:2.4.3'
-        compile 'org.jfrog.artifactory.client:artifactory-java-client-services:1.2.2'
-        compile 'org.jfrog.util:docker-remote-util:0.3'
+dependencies {
+    gradleApi()
+
+    compile 'org.codehaus.groovy:groovy-all:2.4.3'
+    compile 'org.jfrog.artifactory.client:artifactory-java-client-services:1.2.2'
+    compile 'org.jfrog.util:docker-remote-util:0.4'
+}
+
+def getProjectProperty(String property, boolean isMandatory = false) {
+    if (project.hasProperty(property)) {
+        return project.property(property)
+    } else {
+        if (isMandatory) {
+            throw new MissingPropertyException("$property is mandatory.")
+        } else {
+            return null
+        }
     }
+}
+
+compileGroovy.dependsOn clean

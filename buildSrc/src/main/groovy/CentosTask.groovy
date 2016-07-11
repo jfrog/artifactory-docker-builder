@@ -21,7 +21,7 @@ import org.jfrog.util.docker.configurations.DockerFileBuilder
 /**
  * Created by matank on 7/9/15.
  */
-class CentosTask extends BaseTask{
+class CentosTask extends BaseTask {
 
     CentosTask() {
         description = "Build CENTOS ready to work with artifactory"
@@ -51,6 +51,11 @@ yum clean all" //Install pre-requisites
     }
 
     void buildCentosImage() {
+        println "TASK INFO: Building ${centosImage.toString()}"
+        if (centosImage.isExists()) {
+            println "${centosImage} already exists, deleting and recreating it."
+            centosImage.doDelete(true)
+        }
         dockerClient.build(dfb, centosImage)
         println dfb.getDockerfile().text
         dfb.close() //Close DockerFileBuilder to remove any leftovers files from the build process

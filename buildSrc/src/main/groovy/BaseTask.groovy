@@ -34,7 +34,7 @@ abstract class BaseTask extends DefaultTask {
     String hostUrl
     DockerClient dockerClient
     String registry
-    String regsitryUser
+    String registryUser
     String registryPassword
     DockerFileBuilder dfb
     DockerImage centosBaseImage
@@ -42,7 +42,7 @@ abstract class BaseTask extends DefaultTask {
 
     //######### ARTIFACTORY OBJECTS #############//
     String artifactoryVersion
-
+    String artifactoryBuildNumber
     String artifactoryType
 
     abstract void createDockerFile();
@@ -82,8 +82,8 @@ abstract class BaseTask extends DefaultTask {
         logger.info("Using $registry docker registry.")
     }
 
-    void setRegsitryUser(String regsitryUser) {
-        this.regsitryUser = regsitryUser
+    void setRegistryUser(String registryUser) {
+        this.registryUser = registryUser
     }
 
     void setRegistryPassword(String registryPassword) {
@@ -92,6 +92,10 @@ abstract class BaseTask extends DefaultTask {
 
     void setArtifactoryVersion(String artifactoryVersion) {
         this.artifactoryVersion = artifactoryVersion
+    }
+
+    void setArtifactoryBuildNumber(String artifactoryBuildNumber) {
+        this.artifactoryBuildNumber = artifactoryBuildNumber
     }
 
     void setArtifactoryType(String artifactoryType) {

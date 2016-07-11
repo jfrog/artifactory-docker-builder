@@ -51,6 +51,10 @@ yum clean all" //Install pre-requisites
 
     void buildCentosImage() {
         println "TASK INFO: Building ${centosImage.toString()}"
+        if (centosImage.isExists()) {
+            println "${centosImage} already exists, deleting and recreating it."
+            centosImage.doDelete(true)
+        }
         dockerClient.build(dfb, centosImage)
         println dfb.getDockerfile().text
         dfb.close() //Close DockerFileBuilder to remove any leftovers files from the build process

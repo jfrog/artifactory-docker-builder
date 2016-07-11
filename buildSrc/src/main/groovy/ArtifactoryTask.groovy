@@ -116,7 +116,7 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
 
     private void initArtifactoryImage() {
         this.artifactoryImage = dockerClient.image()
-                .registry(new DockerRegistry(registry, registryUser, registryPassword))
+                .registry(registry)
                 .namespace(dockerNamespace)
                 .repository("artifactory-" + (enableNginx ? "registry" : artifactoryType))
                 .tag(StringUtils.isNotEmpty(tag) ? tag : artifactoryVersion)
@@ -193,8 +193,8 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
         if (pushToArtifactory) {
             artifactoryImage.registry(new DockerRegistry(
                     registry,
-                    project.hasProperty('artifactory_user') ? project.getProperty('artifactory_user') : System.getenv("artifactory_user"),
-                    project.hasProperty('artifactory_password') ? project.getProperty('artifactory_password') : System.getenv("artifactory_password")))
+                    registryUser,
+                    registryPassword))
             artifactoryImage.doPush()
 
             if (createLatestTag) {

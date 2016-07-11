@@ -80,7 +80,7 @@ openssl req -nodes -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/demo.key -out /
         }
         if (artifactoryVersion == "latest" || Integer.parseInt(artifactoryVersion[0]) >= 4) {
             dfb.run 'chmod +x /tmp/run.sh && yum install -y --disablerepo="*" --enablerepo="Artifactory-' + artifactoryType +
-                    '" ' + artifactoryPackage + (artifactoryVersion == "latest" ? "" : "-" + artifactoryVersion)
+                    '" ' + artifactoryPackage + getVersionToInstall()
         } else {
             if (artifactoryType == "oss") {
                 dfb.run 'chmod +x /tmp/runArtifactory.sh && \
@@ -119,7 +119,7 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
                 .registry(registry)
                 .namespace(dockerNamespace)
                 .repository("artifactory-" + (enableNginx ? "registry" : artifactoryType))
-                .tag(StringUtils.isNotEmpty(tag) ? tag : artifactoryVersion)
+                .tag(getTagWithBuildNumber())
     }
 
     private void buildArtifactoryImage() {
@@ -237,5 +237,17 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
 
     void setTag(String tag) {
         this.tag = tag
+    }
+
+    String getVersionToInstall() {
+        if (artifactoryVersion == "latest") {
+            return ""
+        }
+
+        return "-" + artifactoryVersion + (StringUtils.isBlank(artifactoryBuildNumber ? "-" + artifactoryBuildNumber : ""))
+    }
+
+    String getTagWithBuildNumber() {
+        return tag + (StringUtils.isBlank(artifactoryBuildNumber ? "-" + artifactoryBuildNumber : ""))
     }
 }

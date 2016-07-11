@@ -21,6 +21,7 @@ apply plugin: 'idea'
 version = '1.0'
 
 def artifactoryVersion = getProjectProperty("artifactory_version") ?: "latest"
+def artifactorBuildNumber = getProjectProperty("artifactory_build_number")
 def dockerUrl = getProjectProperty("DOCKER_URL") ?: "http://localhost:4243/"
 
 def artifactoryType = getProjectProperty("ARTIFACTORY_TYPE") ?: "pro"
@@ -30,7 +31,7 @@ def registry = System.getenv("registry") ?: getProjectProperty("registry")
 def registryUser = System.getenv("registry_user") ?: getProjectProperty("registry_user")
 def registryPassword = System.getenv("registry_password") ?: getProjectProperty("registry_password")
 def artifactory_dependenciesUrl = System.getenv("artifactory_dependenciesUrl") ?: getProjectProperty("artifactory_dependenciesUrl")
-def build_number = getProjectProperty("BUILD_NUMBER")
+def tag = getProjectProperty("tag")
 
 buildscript {
 
@@ -93,6 +94,7 @@ tasks.withType(BaseTask) {
     setRegistryUser(registryUser)
     setRegistryPassword(registryPassword)
     setArtifactoryVersion(artifactoryVersion)
+    setArtifactoryBuildNumber(artifactorBuildNumber)
 }
 
 tasks.withType(ArtifactoryTask) {
@@ -100,9 +102,7 @@ tasks.withType(ArtifactoryTask) {
     setPushToArtifactory(project.hasProperty('push_to_artifactory') ? push_to_artifactory.toBoolean() : false)
     setCreateLatestTag(project.hasProperty('latest_tag') ? latest_tag.toBoolean() : false)
     setDockerNamespace(project.hasProperty('docker_namespace') ? docker_namespace : System.getenv("docker_namespace"))
-    if (build_number) {
-        setTag("$artifactoryVersion-$build_number")
-    }
+    setTag(tag)
 }
 
 task release(dependsOn: ['createArtifactoryOss', 'createArtifactoryPro','createArtifactoryRegistry','publishImagesToBintray','test']) {

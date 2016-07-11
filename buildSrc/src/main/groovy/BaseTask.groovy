@@ -42,7 +42,7 @@ abstract class BaseTask extends DefaultTask {
 
     //######### ARTIFACTORY OBJECTS #############//
     String artifactoryVersion
-
+    String artifactoryBuildNumber
     String artifactoryType
 
     abstract void createDockerFile();
@@ -92,6 +92,10 @@ abstract class BaseTask extends DefaultTask {
 
     void setArtifactoryVersion(String artifactoryVersion) {
         this.artifactoryVersion = artifactoryVersion
+    }
+
+    void setArtifactoryBuildNumber(String artifactoryBuildNumber) {
+        this.artifactoryBuildNumber = artifactoryBuildNumber
     }
 
     void setArtifactoryType(String artifactoryType) {

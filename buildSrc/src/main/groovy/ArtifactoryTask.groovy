@@ -248,6 +248,6 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
     }
 
     String getTagWithBuildNumber() {
-        return tag + (StringUtils.isBlank(artifactoryBuildNumber ? "-" + artifactoryBuildNumber : ""))
+        return tag + (StringUtils.isBlank(artifactoryBuildNumber) ? "-" + artifactoryBuildNumber : "")
     }
 }

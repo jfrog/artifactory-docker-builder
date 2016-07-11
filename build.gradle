@@ -59,7 +59,7 @@ dependencies {
     compile "org.spockframework:spock-core:0.7-groovy-2.0"
     compile "org.codehaus.groovy.modules.http-builder:http-builder:0.7"
     compile "org.jfrog.artifactory.client:artifactory-java-client-services:1.2.2"
-    compile 'org.jfrog.util:docker-remote-util:0.3'
+    compile 'org.jfrog.util:docker-remote-util:0.4'
 }
 
 task publishImagesToBintray(type: BintrayPushTask) {

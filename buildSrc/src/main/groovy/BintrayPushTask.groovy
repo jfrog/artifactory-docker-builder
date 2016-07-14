@@ -43,10 +43,8 @@ class BintrayPushTask extends BaseTask {
 
     @TaskAction
     void deploy() {
-        String user = project.hasProperty('artifactory_user') ? project.getProperty('artifactory_user') : System.getenv("artifactory_user")
-        String pass = project.hasProperty('artifactory_password') ? project.getProperty('artifactory_password') : System.getenv("artifactory_password")
         String dockerRegistry = project.hasProperty('artifactory_contextUrl') ? project.getProperty('artifactory_contextUrl') : System.getenv("artifactory_contextUrl")
-        artifactory = ArtifactoryClient.create(dockerRegistry, user, pass)
+        artifactory = ArtifactoryClient.create(dockerRegistry, registryUser, registryPassword)
         applicationNames.each { it ->
             DockerImage image = dockerClient.image().registry(registry).namespace(dockerNamespace).repository(it).tag(artifactoryVersion)
             if (imageExistsRemotely(image)) {

@@ -174,7 +174,7 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
 
     private void waitUntilArtifactoryIsUp() {
         println "TEST: Wait until artifactory is fully up"
-        Artifactory artifactory = ArtifactoryClient.create("http://localhost:8888/artifactory", "admin", "password")
+        Artifactory artifactory = ArtifactoryClient.create("http://${new URI(hostUrl).host}:8888/artifactory", "admin", "password")
         int maxTimeToWaitInSec = 60
         while (maxTimeToWaitInSec > 0) {
             if (artifactory.system().ping()) {
@@ -195,7 +195,9 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
                     registry,
                     registryUser,
                     registryPassword))
+            println "DOCKER: Pushing image ${artifactoryImage.getFullImageName()}"
             artifactoryImage.doPush()
+            println "DOCKER: Succesfully Pushed ${artifactoryImage.getFullImageName()}"
 
             if (createLatestTag) {
                 DockerImage latestImage = dockerClient.image()
@@ -204,7 +206,9 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
                         .repository(artifactoryImage.getRepository())
                         .tag("latest")
                 artifactoryImage.doTag(latestImage, true)
+                println "DOCKER: Pushing image ${latestImage.getFullImageName()}"
                 latestImage.doPush()
+                println "DOCKER: Succesfully Pushed ${latestImage.getFullImageName()}"
             }
         } else {
             logger.info("Push image is disabled")

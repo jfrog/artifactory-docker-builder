@@ -1,4 +1,11 @@
 #Artifactory Docker image builder
+
+# NOTICE - This repository is now deprecated!
+Artifactory 5 is now available that has a redesigned Docker distribution.  
+You can see examples in the new [artifactory-docker-examples](https://github.com/JFrogDev/artifactory-docker-examples) repository.
+
+
+
 ###This project serves as a template you can use to build Artifactory Docker images, push them to an Artifactory Docker registry, and from them, publish them to bintray for distribution:
 
 ###General:

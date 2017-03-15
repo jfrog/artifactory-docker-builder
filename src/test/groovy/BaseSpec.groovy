@@ -59,8 +59,8 @@ abstract class BaseSpec extends Specification {
         artifactoryImage = dockerClient.image().registry(bintrayRegistry).namespace(dockerNamespace).repository(getDockerRepository()).tag(tag).doCreate()
         artifactoryContainer = artifactoryImage.getNewContainer()
         artifactoryContainer.createConfig.addEnv("RUNTIME_OPTS", "-Djava.security.egd=file:/dev/./urandom")
-        artifactoryContainer.doCreate()
         artifactoryContainer.startConfig.addPortBinding(8081, "tcp", "0.0.0.0", 8081)
+        artifactoryContainer.doCreate()
         artifactoryContainer.doStart()
         waitForArtifactory()
     }

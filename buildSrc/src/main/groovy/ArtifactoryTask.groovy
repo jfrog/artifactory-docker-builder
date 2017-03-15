@@ -144,6 +144,10 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
         int portBound = 8888
         DockerContainer artifactoryContainer = artifactoryImage.getNewContainer("artifactory-" + artifactoryType)
         artifactoryContainer.startConfig.addPortBinding(8081, "tcp", "0.0.0.0", portBound)
+        if (artifactoryType != "oss") {
+            artifactoryContainer.startConfig.addBinds(artifactoryLicense.path, ARTIFACTORY_HOME + "/etc/artifactory.lic")
+            println "TEST: using license located at ${ARTIFACTORY_HOME}etc/artifactory.lic"
+        }
 
         try {
             println "TEST: Creates artifactory container bound to port $portBound"
@@ -155,11 +159,6 @@ cp -rp /etc/opt/jfrog/artifactory/* /var/opt/jfrog/artifactory/defaults/etc/'
         }
 
         try {
-            if (artifactoryType != "oss") {
-                artifactoryContainer.startConfig.addBinds(artifactoryLicense.path, ARTIFACTORY_HOME + "/etc/artifactory.lic")
-                println "TEST: using license located at ${ARTIFACTORY_HOME}etc/artifactory.lic"
-            }
-
             println "TEST: Starts artifactory container bound to port $portBound"
             artifactoryContainer.doStart()
             waitUntilArtifactoryIsUp()

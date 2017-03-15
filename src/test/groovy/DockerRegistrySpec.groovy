@@ -36,8 +36,8 @@ class DockerRegistrySpec extends DockerProSpec {
                         "docker login -u admin -p password ${deployImage.getRegistry().registryHost} ; " +
                         "docker push ${deployImage.getFullImageName()}", false)
 
-        this.dockerContainer.doCreate()
         this.dockerContainer.startConfig.withPrivileges().addLink(this.artName, "artifactory.local").addLink(this.artName, "artifactory2.local").addLink(this.artName, "artifactory2.remote")
+        this.dockerContainer.doCreate()
 
         when:
         this.dockerContainer.doStart(600)
@@ -57,8 +57,8 @@ class DockerRegistrySpec extends DockerProSpec {
         dockerContainer.createConfig
                 .addEnv("DOCKER_DAEMON_ARGS", "--insecure-registry artifactory.local:" + port)
                 .addCommand("docker login -u admin -p password -e auto-test@jfrog.com artifactory.local:" + port, false)
-        dockerContainer.doCreate()
         dockerContainer.startConfig.withPrivileges().addLink(artName, "artifactory.local")
+        dockerContainer.doCreate()
 
         when:
         dockerContainer.doStart(60)
@@ -84,8 +84,8 @@ class DockerRegistrySpec extends DockerProSpec {
         dockerContainer.createConfig
                 .addEnv("DOCKER_DAEMON_ARGS", "--insecure-registry " + subdomain + ".art.local")
                 .addCommand("docker login -u admin -p password -e auto-test@jfrog.com " + subdomain + ".art.local", false)
-        dockerContainer.doCreate()
         dockerContainer.startConfig.withPrivileges().addLink(artName, subdomain + ".art.local")
+        dockerContainer.doCreate()
 
         when:
         dockerContainer.doStart(60)
